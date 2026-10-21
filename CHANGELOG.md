@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full Tauri command handlers integration test suite (`src-tauri/tests/commands_integration.rs`).
 - Comprehensive React frontend testing infrastructure with `@testing-library/react`, `@testing-library/user-event`, and `jsdom`.
 - Complete test suites covering custom hooks (`useGames`, `useCloud`), interactive modals and drawers (`AddGameModal`, `SnapshotDrawer`, `GameCard`, `ConflictModal`, `SettingsModal`), and application root (`App.tsx`).
+- Turbocharged CI pipeline with `Swatinem/rust-cache@v2` and `pnpm/action-setup@v4` store caching across all operating systems.
+- Streamlined macOS distribution exclusively targeting modern Apple Silicon (M1/M2/M3/M4) native `.dmg`.
+- Enhanced Windows NSIS installer with Start Menu program folder organization.
 
 ## [0.1.0] - 2026-10-21
 
