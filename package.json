@@ -1,8 +1,9 @@
 {
-  "name": "memcard-cloud",
+  "name": "memcard",
   "private": true,
   "version": "0.1.0-alpha.0",
   "type": "module",
+  "packageManager": "pnpm@12.14.0",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

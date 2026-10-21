@@ -18,10 +18,8 @@ jobs:
         with:
           node-version: 22
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
+      - name: Install pnpm
+        run: npm install -g pnpm
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -29,7 +27,7 @@ jobs:
           components: clippy, rustfmt
 
       - name: Install Frontend Dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: Frontend Format & Lint
         run: |
@@ -64,16 +62,14 @@ jobs:
         with:
           node-version: 22
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
+      - name: Install pnpm
+        run: npm install -g pnpm
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install Frontend Dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: Run Frontend Tests
         run: pnpm test
