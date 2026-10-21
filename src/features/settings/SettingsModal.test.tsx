@@ -18,11 +18,31 @@ describe("SettingsModal Component", () => {
 
     expect(screen.getByText("MemCard Preferences")).toBeInTheDocument();
     expect(screen.getByText("Synthesized Chimes")).toBeInTheDocument();
+    expect(screen.getByText("Gamer Mode Notifications")).toBeInTheDocument();
 
-    const muteBtn = screen.getByRole("button", { name: /active|muted/i });
-    await user.click(muteBtn);
+    const chimesRow = screen.getByText("Synthesized Chimes").closest(".rounded-xl");
+    const muteBtn = chimesRow?.querySelector("button");
+    expect(muteBtn).toBeInTheDocument();
+    await user.click(muteBtn!);
 
     expect(setMutedSpy).toHaveBeenCalled();
+  });
+
+  it("toggles gamer mode notifications setting", async () => {
+    const user = userEvent.setup();
+
+    render(<SettingsModal isOpen={true} onClose={vi.fn()} />);
+
+    const notifRow = screen.getByText("Gamer Mode Notifications").closest(".rounded-xl");
+    const notifBtn = notifRow?.querySelector("button");
+    expect(notifBtn).toBeInTheDocument();
+    expect(notifBtn?.textContent).toBe("Active");
+
+    await user.click(notifBtn!);
+    expect(notifBtn?.textContent).toBe("Disabled");
+
+    await user.click(notifBtn!);
+    expect(notifBtn?.textContent).toBe("Active");
   });
 
   it("calls onClose when close icon is clicked", async () => {

@@ -33,3 +33,9 @@ Gamers value immersion and aesthetics. MemCard Cloud departs from sterile corpor
 - **Then** the window hides to the System Tray instead of terminating the process
 - **And** background RSS RAM usage remains strictly under 40 MB
 - **And** the tray icon context menu provides "Open", "Sync Now", and "Quit".
+
+### Scenario: Discrete OS Notifications & Gamer Mode
+- **Given** desktop notifications are enabled
+- **When** an automated snapshot is created in background
+- **Then** a discrete native OS notification is triggered displaying the game name
+- **And** when the user toggles notifications off in preferences ("Gamer Mode"), OS notifications are silenced.

@@ -128,3 +128,17 @@ Applies user's chosen conflict resolution strategy.
   }
   ```
 - **Returns:** `void`
+
+---
+
+## 4. User Preferences & Notifications
+
+### `get_notifications_enabled`
+Returns whether desktop OS notifications are enabled.
+- **Parameters:** none
+- **Returns:** `boolean`
+
+### `set_notifications_enabled`
+Enables or disables desktop OS notifications (Gamer Mode).
+- **Parameters:** `{ enabled: boolean }`
+- **Returns:** `void`
