@@ -26,9 +26,9 @@ To provide seamless installation for end users across desktop gaming environment
 - **Given** a new version tag (e.g. `v0.2.0`) pushed to GitHub or triggered via `workflow_dispatch`
 - **When** the `release.yml` GitHub Actions workflow triggers
 - **Then** a matrix builds native binaries across:
-  - macOS (Apple Silicon `aarch64` and Intel `x86_64`) into `.dmg` installers
-  - Windows (`x64`) into an NSIS installer (`.exe`)
-  - Linux (`x64`) into a portable `.AppImage` and Debian `.deb` package
+  - macOS (Apple Silicon `aarch64` native for M1/M2/M3/M4) into a `.dmg` installer
+  - Windows (`x64`) into an NSIS installer (`.exe`) with Start Menu organization
+  - Linux (`x64`) into a portable `.AppImage` and Debian `.deb` package with SteamOS integration
 - **And** all distributables are uploaded directly to the GitHub Release.
 
 ### Scenario: Verifiable Cryptographic Checksum Manifest
