@@ -7,14 +7,14 @@ use uuid::Uuid;
 pub trait GameRepository: Send + Sync {
     async fn find_all(&self) -> Result<Vec<Game>>;
     async fn find_by_id(&self, id: Uuid) -> Result<Option<Game>>;
-    async fn save(&self, game: &Game) -> Result<()>;
+    async fn save_game(&self, game: &Game) -> Result<()>;
     async fn delete(&self, id: Uuid) -> Result<()>;
 }
 
 #[async_trait]
 pub trait SnapshotRepository: Send + Sync {
     async fn find_by_game_id(&self, game_id: Uuid) -> Result<Vec<Snapshot>>;
-    async fn save(&self, snapshot: &Snapshot) -> Result<()>;
+    async fn save_snapshot(&self, snapshot: &Snapshot) -> Result<()>;
     async fn set_pinned(&self, snapshot_id: Uuid, is_pinned: bool) -> Result<()>;
     async fn prune_oldest(&self, game_id: Uuid, keep_count: usize) -> Result<usize>;
 }

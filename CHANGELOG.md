@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Embedded SQLite persistence engine (`SqliteDatabase`) with WAL mode, transactions, and index optimizations.
+- Implementations of `GameRepository` and `SnapshotRepository` with snapshot pinning support.
+- Streaming ZIP snapshot compression and atomic staging restoration (`create_snapshot_zip` and `restore_snapshot_zip`).
+- High-level `SnapshotService` orchestrating imutability, pre-restore backups, and retention policy pruning.
 - Asynchronous File System Watcher with 3-second inactivity debounce (`notify-rs` + Tokio).
 - Deterministic SHA-256 tree hasher for single files and directory saves with path normalization.
 - Zero-Byte and Corruption Shield preventing sync of empty or severely damaged (>80% loss) saves.
