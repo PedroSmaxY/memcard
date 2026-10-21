@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Asynchronous File System Watcher with 3-second inactivity debounce (`notify-rs` + Tokio).
+- Deterministic SHA-256 tree hasher for single files and directory saves with path normalization.
+- Zero-Byte and Corruption Shield preventing sync of empty or severely damaged (>80% loss) saves.
+- Game Running Guard with cross-platform file lock detection.
+- Comprehensive test suite covering debouncing, tree hashing, and corruption shield detection.
 - Initial project architecture and Spec-Driven Development (SDD) workspace foundation.
 - Architectural Decision Records (`ADRs`) for Tauri v2, SQLite, Google Drive PKCE, and Safety Shields.
 - IPC commands and events contracts under `specs/contracts/`.
