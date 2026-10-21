@@ -65,11 +65,7 @@ pub async fn get_sync_status(state: State<'_, AppState>) -> Result<CloudStatusDt
     })
 }
 
-#[tauri::command]
-pub async fn resolve_conflict(
-    _state: State<'_, AppState>,
-    request: ResolveConflictRequest,
-) -> Result<(), String> {
+pub fn resolve_conflict_handler(request: ResolveConflictRequest) -> Result<(), String> {
     match request.action.as_str() {
         "keep_local" | "use_cloud" | "branch_slot" => Ok(()),
         _ => Err(format!(
@@ -77,4 +73,12 @@ pub async fn resolve_conflict(
             request.action
         )),
     }
+}
+
+#[tauri::command]
+pub async fn resolve_conflict(
+    _state: State<'_, AppState>,
+    request: ResolveConflictRequest,
+) -> Result<(), String> {
+    resolve_conflict_handler(request)
 }

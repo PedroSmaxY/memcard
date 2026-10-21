@@ -25,8 +25,14 @@ pub struct RemoveGameRequest {
     pub delete_snapshots: bool,
 }
 
-#[tauri::command]
-pub async fn add_game(state: State<'_, AppState>, request: AddGameRequest) -> Result<Game, String> {
+pub async fn add_game_handler(
+    db: &crate::adapters::db::SqliteDatabase,
+    snapshot_service: &crate::core::services::snapshot::SnapshotService<
+        crate::adapters::db::SqliteDatabase,
+        crate::adapters::db::SqliteDatabase,
+    >,
+    request: AddGameRequest,
+) -> Result<Game, String> {
     let path = Path::new(&request.save_path);
     if !path.exists() {
         return Err(format!(
@@ -52,16 +58,21 @@ pub async fn add_game(state: State<'_, AppState>, request: AddGameRequest) -> Re
         emulator_preset: request.emulator_preset,
     };
 
-    state.db.save_game(&game).await.map_err(|e| e.to_string())?;
+    db.save_game(&game).await.map_err(|e| e.to_string())?;
 
-    // Create initial baseline snapshot
-    let _ = state
-        .snapshot_service
+    // Create initial baseline snapshot; reject enrollment if baseline fails (e.g. Zero-Byte Shield rejection)
+    if let Err(e) = snapshot_service
         .create_snapshot(game_id, Some("Initial baseline snapshot".to_string()))
-        .await;
+        .await
+    {
+        let _ = db.delete(game_id).await;
+        return Err(format!(
+            "Failed to create initial baseline snapshot (Zero-Byte Shield or storage error): {}",
+            e
+        ));
+    }
 
-    let fresh_game = state
-        .db
+    let fresh_game = db
         .find_by_id(game_id)
         .await
         .map_err(|e| e.to_string())?
@@ -71,8 +82,39 @@ pub async fn add_game(state: State<'_, AppState>, request: AddGameRequest) -> Re
 }
 
 #[tauri::command]
+pub async fn add_game(state: State<'_, AppState>, request: AddGameRequest) -> Result<Game, String> {
+    add_game_handler(&state.db, &state.snapshot_service, request).await
+}
+
+pub async fn list_games_handler(
+    db: &crate::adapters::db::SqliteDatabase,
+) -> Result<Vec<Game>, String> {
+    db.find_all().await.map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 pub async fn list_games(state: State<'_, AppState>) -> Result<Vec<Game>, String> {
-    state.db.find_all().await.map_err(|e| e.to_string())
+    list_games_handler(&state.db).await
+}
+
+pub async fn remove_game_handler(
+    db: &crate::adapters::db::SqliteDatabase,
+    snapshots_dir: &Path,
+    request: RemoveGameRequest,
+) -> Result<(), String> {
+    if request.delete_snapshots {
+        let game_dir = snapshots_dir.join(request.game_id.to_string());
+        if game_dir.exists() {
+            fs::remove_dir_all(&game_dir).map_err(|e| {
+                format!(
+                    "Failed to delete snapshots directory for game {}: {}",
+                    request.game_id, e
+                )
+            })?;
+        }
+    }
+
+    db.delete(request.game_id).await.map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -80,16 +122,5 @@ pub async fn remove_game(
     state: State<'_, AppState>,
     request: RemoveGameRequest,
 ) -> Result<(), String> {
-    if request.delete_snapshots {
-        let game_dir = state.snapshots_dir.join(request.game_id.to_string());
-        if game_dir.exists() {
-            let _ = fs::remove_dir_all(&game_dir);
-        }
-    }
-
-    state
-        .db
-        .delete(request.game_id)
-        .await
-        .map_err(|e| e.to_string())
+    remove_game_handler(&state.db, &state.snapshots_dir, request).await
 }

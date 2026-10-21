@@ -166,7 +166,12 @@ impl<G: GameRepository, S: SnapshotRepository> SnapshotService<G, S> {
                 Utc::now().format("%Y%m%dT%H%M%SZ")
             );
             let backup_path = game_snapshots_dir.join(&backup_filename);
-            let _ = create_snapshot_zip(save_path, &backup_path);
+            create_snapshot_zip(save_path, &backup_path).with_context(|| {
+                format!(
+                    "Failed to create verified pre-restore safety backup at '{}'. Restoration aborted to prevent save loss.",
+                    backup_path.display()
+                )
+            })?;
         }
 
         // 5. Atomic extraction and replacement

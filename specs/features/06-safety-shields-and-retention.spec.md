@@ -40,3 +40,16 @@ Crashes and simultaneous file writes can destroy video game saves. MemCard Cloud
 - **When** a new snapshot is created and unpinned snapshots exceed $N$
 - **Then** the oldest unpinned snapshots are pruned
 - **And** all pinned snapshots are strictly retained.
+
+### Scenario: Pre-Restore Safety Backup Obligation (Zero Save Loss)
+- **Given** an active game save on disk and a restore operation requested
+- **When** the pre-restore backup snapshot creation fails (e.g., I/O error or disk full)
+- **Then** the restore operation is immediately aborted with an explicit error
+- **And** the active save file on disk is left 100% untouched and intact.
+
+### Scenario: Baseline Snapshot Mandatory Enforcement
+- **Given** a user attempting to enroll a new game save
+- **When** the initial baseline snapshot creation fails or is rejected by the Zero-Byte Shield
+- **Then** the game enrollment is strictly aborted
+- **And** any partial database records are cleaned up
+- **And** an explicit error is returned to the user.
