@@ -1,7 +1,7 @@
 # Feature Specification: 06 - Safety Shields, File Locks & Retention Policy
 
 - **ID:** `06`
-- **Status:** `Accepted`
+- **Status:** `Implemented`
 - **Author:** MemCard Cloud Team
 - **Created:** 2026-10-21
 - **Updated:** 2026-10-21

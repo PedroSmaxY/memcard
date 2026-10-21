@@ -11,15 +11,16 @@ import {
 } from "lucide-react";
 import { Platform } from "./features/games/presets";
 import { useGames, Game } from "./hooks/useGames";
+import { useCloud } from "./hooks/useCloud";
 import { GameCard } from "./features/games/GameCard";
 import { AddGameModal } from "./features/games/AddGameModal";
 import { SnapshotDrawer } from "./features/snapshots/SnapshotDrawer";
 import { SettingsModal } from "./features/settings/SettingsModal";
+import { ConflictModal } from "./features/sync/ConflictModal";
 import { soundEngine } from "./utils/audio";
 
 export default function App() {
   const [selectedPlatform, setSelectedPlatform] = useState<Platform>("ps1");
-  const [isCloudConnected] = useState<boolean>(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [selectedGameForHistory, setSelectedGameForHistory] = useState<Game | null>(null);
@@ -35,6 +36,15 @@ export default function App() {
     togglePinSnapshot,
   } = useGames();
 
+  const {
+    status: cloudStatus,
+    activeConflict,
+    setActiveConflict,
+    login: loginCloud,
+    logout: logoutCloud,
+    resolveConflict,
+  } = useCloud();
+
   const filteredGames = games.filter((g) => g.platform === selectedPlatform);
 
   const handleSelectPlatform = (platform: Platform) => {
@@ -44,6 +54,16 @@ export default function App() {
 
   const handleOpenHistory = (game: Game) => {
     setSelectedGameForHistory(game);
+  };
+
+  const handleCloudToggle = async () => {
+    if (cloudStatus.isConnected) {
+      if (window.confirm(`Disconnect Google Drive account (${cloudStatus.email})?`)) {
+        await logoutCloud();
+      }
+    } else {
+      await loginCloud();
+    }
   };
 
   return (
@@ -65,16 +85,16 @@ export default function App() {
 
           <div className="flex items-center gap-2">
             <button 
-              onClick={() => soundEngine.playClick()}
+              onClick={handleCloudToggle}
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium transition-all ${
-                isCloudConnected 
+                cloudStatus.isConnected 
                   ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" 
                   : "bg-white/5 text-neutral-400 border border-white/10 hover:bg-white/10"
               }`}
-              title="Cloud Sync Status"
+              title={cloudStatus.isConnected ? `Connected as ${cloudStatus.email}` : "1-Click Connect Google Drive"}
             >
               <Cloud className="w-3 h-3" />
-              <span>{isCloudConnected ? "Synced" : "Offline"}</span>
+              <span>{cloudStatus.isConnected ? "Drive Synced" : "Connect Drive"}</span>
             </button>
 
             <button 
@@ -237,6 +257,13 @@ export default function App() {
         <SettingsModal
           isOpen={isSettingsModalOpen}
           onClose={() => setIsSettingsModalOpen(false)}
+        />
+
+        <ConflictModal
+          conflict={activeConflict}
+          isOpen={Boolean(activeConflict)}
+          onResolve={resolveConflict}
+          onClose={() => setActiveConflict(null)}
         />
 
       </div>

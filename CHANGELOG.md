@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- 1-Click Google Drive Cloud Sync using zero-friction PKCE and non-sensitive `drive.file` scope.
+- Ephemeral HTTP loopback server capturing OAuth authorization callback with automatic cleanup.
+- Drive save storage organization under `MemCardCloud/Saves/<game_id>/<timestamp>_<hash>.zip`.
+- 3-Way Visual Conflict Resolution Modal with side-by-side local vs cloud metadata comparison.
+- Three resolution strategies: Keep Local (upload), Use Cloud (safe pre-restore snapshot + download), and Branch / Duplicate into Slot 2.
 - Complete Liquid Glass Neo-Skeuomorphic memory card UI with custom chamfer, side grip grooves, and tactile status pills.
 - Tauri IPC commands for game enrollment, platform filtering, snapshot creation, version history listing, and atomic restore.
 - System Tray lifecycle integration with background minimize-to-tray window hiding (<40 MB RAM RSS footprint).
