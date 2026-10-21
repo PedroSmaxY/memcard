@@ -54,3 +54,9 @@ Object.defineProperty(window, "webkitAudioContext", {
   writable: true,
   value: MockAudioContext,
 });
+
+// Tauri event mock for jsdom
+vi.mock("@tauri-apps/api/event", () => ({
+  listen: vi.fn().mockImplementation(() => Promise.resolve(vi.fn())),
+  emit: vi.fn().mockImplementation(() => Promise.resolve()),
+}));

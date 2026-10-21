@@ -33,3 +33,9 @@ Emulators and games continuously write or update save data during gameplay. A na
 - **Given** an enrolled game watching directory `/saves/PS3_SAVEDATA/`
 - **When** files inside the directory tree are updated
 - **Then** the watcher deterministically walks the directory, sorts file paths, hashes each file, and computes a composite tree hash.
+
+### Scenario: Push Event Emission & Frontend Notification
+- **Given** an enrolled game save changes on disk and passes the 3-second quiet-period debounce
+- **When** the snapshot is successfully created and verified
+- **Then** the core emits `watcher:save-changed` to the webview
+- **And** the frontend triggers the memory card save chime and automatically refetches the games list.
