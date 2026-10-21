@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tauri push event broadcasting for cloud synchronization lifecycle (`sync:status-changed`) and remote divergence alerts (`sync:conflict-detected`).
 - React frontend listeners in `useCloud` and `useGames` for real-time sync progress badges, timestamp updates, and instant `ConflictModal` activation.
 - `SnapshotService::get_snapshot_archive_path` helper for clean and deterministic snapshot archive resolution.
+- Native desktop OS notifications integration via `tauri-plugin-notification`: discrete save backup notifications and urgent Corruption Shield alerts during gameplay.
+- Gamer Mode preference toggle in `SettingsModal` allowing users to silence or activate OS notifications.
+- Tauri IPC commands `get_notifications_enabled` and `set_notifications_enabled`.
 
 ## [0.1.1] - 2026-10-21
 

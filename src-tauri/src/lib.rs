@@ -8,10 +8,12 @@ use core::services::retention::RetentionPolicy;
 use core::services::shield::ShieldService;
 use core::services::snapshot::SnapshotService;
 use std::fs;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use tauri::menu::{Menu, MenuItem};
 use tauri::tray::TrayIconBuilder;
 use tauri::{Emitter, Manager};
+use tauri_plugin_notification::NotificationExt;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -58,12 +60,15 @@ pub fn run() {
                 .expect("Failed to initialize filesystem watcher service"),
             ));
 
+            let notifications_enabled = Arc::new(AtomicBool::new(true));
+
             app.manage(commands::AppState {
                 db: Arc::clone(&db),
                 snapshot_service: Arc::clone(&snapshot_service),
                 snapshots_dir: snapshots_dir.clone(),
                 cloud_provider: Arc::clone(&cloud_provider),
                 watcher: Arc::clone(&watcher),
+                notifications_enabled: Arc::clone(&notifications_enabled),
             });
 
             // Enroll existing games from database into watcher
@@ -90,6 +95,7 @@ pub fn run() {
             let snapshot_service_for_watcher = Arc::clone(&snapshot_service);
             let db_for_watcher = Arc::clone(&db);
             let cloud_provider_for_watcher = Arc::clone(&cloud_provider);
+            let notifications_enabled_for_watcher = Arc::clone(&notifications_enabled);
 
             tauri::async_runtime::spawn(async move {
                 while let Some(event) = watch_rx.recv().await {
@@ -112,6 +118,23 @@ pub fn run() {
                                         "timestamp": snapshot.timestamp.to_rfc3339(),
                                     });
                                     let _ = app_handle.emit("watcher:save-changed", payload);
+
+                                    // Discrete OS notification if Gamer Mode notifications are enabled
+                                    if notifications_enabled_for_watcher.load(Ordering::Relaxed) {
+                                        let game_name = if let Ok(Some(g)) =
+                                            db_for_watcher.find_by_id(game_id).await
+                                        {
+                                            g.name
+                                        } else {
+                                            "Game save".to_string()
+                                        };
+                                        let _ = app_handle
+                                            .notification()
+                                            .builder()
+                                            .title("MemCard Cloud")
+                                            .body(format!("Save protected for {}", game_name))
+                                            .show();
+                                    }
 
                                     // Automatic cloud sync loop if authenticated
                                     if cloud_provider_for_watcher.is_authenticated().await {
@@ -218,6 +241,24 @@ pub fn run() {
                                 "reason": reason_str,
                             });
                             let _ = app_handle.emit("shield:corruption-detected", payload);
+
+                            // Discrete OS notification alert for save corruption
+                            if notifications_enabled_for_watcher.load(Ordering::Relaxed) {
+                                let _ = app_handle
+                                    .notification()
+                                    .builder()
+                                    .title("MemCard Corruption Shield Alert")
+                                    .body(format!(
+                                        "Save blocked for {}: {}",
+                                        game_name,
+                                        if reason_str == "zero_bytes" {
+                                            "Empty save (0 bytes) detected."
+                                        } else {
+                                            "Abrupt size reduction (>80%) detected."
+                                        }
+                                    ))
+                                    .show();
+                            }
                         }
                         adapters::fs_watcher::WatchEvent::Error { game_id, message } => {
                             eprintln!("Watcher error for game {:?}: {}", game_id, message);
@@ -274,6 +315,8 @@ pub fn run() {
             commands::cloud::login_cloud,
             commands::cloud::logout_cloud,
             commands::cloud::resolve_conflict,
+            commands::get_notifications_enabled,
+            commands::set_notifications_enabled,
         ])
         .run(tauri::generate_context!())
         .expect("error while running MemCard Cloud application");
