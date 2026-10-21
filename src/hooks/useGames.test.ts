@@ -291,4 +291,58 @@ describe("useGames Hook", () => {
     expect(result.current.error).toContain("Corruption Shield alert for Castlevania");
     expect(result.current.error).toContain("file size dropped to 0 bytes");
   });
+
+  it("handles sync:status-changed event by updating game syncStatus in state", async () => {
+    (window as unknown as { __TAURI_INTERNALS__: unknown }).__TAURI_INTERNALS__ = {};
+    const mockGame = {
+      id: "game-sync-test",
+      name: "Resident Evil 2",
+      platform: "ps1",
+      savePath: "/saves/re2.mcd",
+      isDirectory: false,
+      currentHash: "hash123",
+      lastModifiedAt: new Date().toISOString(),
+      syncStatus: "local_only",
+      totalSnapshots: 1,
+    };
+    vi.mocked(tauriCore.invoke).mockResolvedValueOnce([mockGame]);
+
+    let syncStatusHandler: ((event: unknown) => void) | undefined;
+    vi.mocked(tauriEvent.listen).mockImplementation(async (eventName, handler) => {
+      if (eventName === "sync:status-changed") {
+        syncStatusHandler = handler as (event: unknown) => void;
+      }
+      return vi.fn();
+    });
+
+    const { result } = renderHook(() => useGames());
+    await act(async () => {});
+
+    expect(result.current.games[0].syncStatus).toBe("local_only");
+    expect(syncStatusHandler).toBeDefined();
+
+    // 1. Transition to syncing
+    await act(async () => {
+      syncStatusHandler!({
+        payload: {
+          gameId: "game-sync-test",
+          status: "syncing",
+        },
+      });
+    });
+
+    expect(result.current.games[0].syncStatus).toBe("syncing");
+
+    // 2. Transition to synced
+    await act(async () => {
+      syncStatusHandler!({
+        payload: {
+          gameId: "game-sync-test",
+          status: "synced",
+        },
+      });
+    });
+
+    expect(result.current.games[0].syncStatus).toBe("synced");
+  });
 });

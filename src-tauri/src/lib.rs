@@ -3,7 +3,7 @@ pub mod commands;
 pub mod core;
 
 use adapters::db::SqliteDatabase;
-use core::ports::{GameRepository, SnapshotRepository};
+use core::ports::{CloudStorageProvider, GameRepository, SnapshotRepository};
 use core::services::retention::RetentionPolicy;
 use core::services::shield::ShieldService;
 use core::services::snapshot::SnapshotService;
@@ -62,7 +62,7 @@ pub fn run() {
                 db: Arc::clone(&db),
                 snapshot_service: Arc::clone(&snapshot_service),
                 snapshots_dir: snapshots_dir.clone(),
-                cloud_provider,
+                cloud_provider: Arc::clone(&cloud_provider),
                 watcher: Arc::clone(&watcher),
             });
 
@@ -89,6 +89,7 @@ pub fn run() {
             let app_handle = app.handle().clone();
             let snapshot_service_for_watcher = Arc::clone(&snapshot_service);
             let db_for_watcher = Arc::clone(&db);
+            let cloud_provider_for_watcher = Arc::clone(&cloud_provider);
 
             tauri::async_runtime::spawn(async move {
                 while let Some(event) = watch_rx.recv().await {
@@ -111,6 +112,69 @@ pub fn run() {
                                         "timestamp": snapshot.timestamp.to_rfc3339(),
                                     });
                                     let _ = app_handle.emit("watcher:save-changed", payload);
+
+                                    // Automatic cloud sync loop if authenticated
+                                    if cloud_provider_for_watcher.is_authenticated().await {
+                                        let _ = app_handle.emit(
+                                            "sync:status-changed",
+                                            serde_json::json!({
+                                                "gameId": game_id.to_string(),
+                                                "status": "syncing"
+                                            }),
+                                        );
+
+                                        let archive_path = snapshot_service_for_watcher
+                                            .get_snapshot_archive_path(game_id, &snapshot);
+
+                                        match tokio::fs::read(&archive_path).await {
+                                            Ok(zip_bytes) => {
+                                                if let Ok(Some(mut game)) =
+                                                    db_for_watcher.find_by_id(game_id).await
+                                                {
+                                                    match cloud_provider_for_watcher
+                                                        .upload_snapshot(&game, &snapshot, zip_bytes)
+                                                        .await
+                                                    {
+                                                        Ok(_remote_id) => {
+                                                            game.sync_status =
+                                                                crate::core::domain::SyncStatus::Synced;
+                                                            let _ = db_for_watcher.save_game(&game).await;
+                                                            let _ = app_handle.emit(
+                                                                "sync:status-changed",
+                                                                serde_json::json!({
+                                                                    "gameId": game_id.to_string(),
+                                                                    "status": "synced"
+                                                                }),
+                                                            );
+                                                        }
+                                                        Err(err) => {
+                                                            eprintln!(
+                                                                "Cloud upload failed for game {}: {}",
+                                                                game_id, err
+                                                            );
+                                                            game.sync_status =
+                                                                crate::core::domain::SyncStatus::Error;
+                                                            let _ = db_for_watcher.save_game(&game).await;
+                                                            let _ = app_handle.emit(
+                                                                "sync:status-changed",
+                                                                serde_json::json!({
+                                                                    "gameId": game_id.to_string(),
+                                                                    "status": "error",
+                                                                    "message": err.to_string()
+                                                                }),
+                                                            );
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            Err(err) => {
+                                                eprintln!(
+                                                    "Failed to read snapshot archive for cloud upload: {}",
+                                                    err
+                                                );
+                                            }
+                                        }
+                                    }
                                 }
                                 Err(err) => {
                                     eprintln!(

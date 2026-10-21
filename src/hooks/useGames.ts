@@ -120,6 +120,7 @@ export function useGames() {
     let isSubscribed = true;
     let unlistenSaveChanged: (() => void) | undefined;
     let unlistenCorruption: (() => void) | undefined;
+    let unlistenSyncStatus: (() => void) | undefined;
 
     const setupListeners = async () => {
       try {
@@ -156,6 +157,26 @@ export function useGames() {
         } else {
           unlisten2();
         }
+
+        const unlisten3 = await listen<{
+          gameId: string;
+          status: Game["syncStatus"];
+          message?: string;
+        }>("sync:status-changed", (event) => {
+          if (!isSubscribed) return;
+          setGames((prev) =>
+            prev.map((g) =>
+              g.id === event.payload.gameId
+                ? { ...g, syncStatus: event.payload.status }
+                : g
+            )
+          );
+        });
+        if (isSubscribed) {
+          unlistenSyncStatus = unlisten3;
+        } else {
+          unlisten3();
+        }
       } catch (err) {
         console.error("Failed to setup Tauri push event listeners:", err);
       }
@@ -167,6 +188,7 @@ export function useGames() {
       isSubscribed = false;
       if (unlistenSaveChanged) unlistenSaveChanged();
       if (unlistenCorruption) unlistenCorruption();
+      if (unlistenSyncStatus) unlistenSyncStatus();
     };
   }, [fetchGames]);
 

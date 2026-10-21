@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useCloud } from "./useCloud";
 import * as tauriCore from "@tauri-apps/api/core";
+import * as tauriEvent from "@tauri-apps/api/event";
 import { soundEngine } from "../utils/audio";
 
 vi.mock("@tauri-apps/api/core", () => ({
@@ -125,5 +126,84 @@ describe("useCloud Hook", () => {
     });
     expect(result.current.activeConflict).toBeNull();
     expect(soundEngine.playSaveChime).toHaveBeenCalled();
+  });
+
+  it("handles sync:status-changed push event and updates isSyncing and lastSyncedAt", async () => {
+    (window as unknown as { __TAURI_INTERNALS__: unknown }).__TAURI_INTERNALS__ = {};
+    vi.mocked(tauriCore.invoke).mockResolvedValueOnce({ isConnected: true, isSyncing: false });
+
+    let statusChangedHandler: ((event: unknown) => void) | undefined;
+    vi.mocked(tauriEvent.listen).mockImplementation(async (eventName, handler) => {
+      if (eventName === "sync:status-changed") {
+        statusChangedHandler = handler as (event: unknown) => void;
+      }
+      return vi.fn();
+    });
+
+    const { result } = renderHook(() => useCloud());
+    await act(async () => {});
+
+    expect(statusChangedHandler).toBeDefined();
+
+    // 1. Emit syncing state
+    await act(async () => {
+      statusChangedHandler!({
+        payload: {
+          gameId: "game-1",
+          status: "syncing",
+        },
+      });
+    });
+
+    expect(result.current.status.isSyncing).toBe(true);
+
+    // 2. Emit synced state
+    await act(async () => {
+      statusChangedHandler!({
+        payload: {
+          gameId: "game-1",
+          status: "synced",
+        },
+      });
+    });
+
+    expect(result.current.status.isSyncing).toBe(false);
+    expect(result.current.status.lastSyncedAt).toBeDefined();
+  });
+
+  it("handles sync:conflict-detected push event and sets activeConflict", async () => {
+    (window as unknown as { __TAURI_INTERNALS__: unknown }).__TAURI_INTERNALS__ = {};
+    vi.mocked(tauriCore.invoke).mockResolvedValueOnce({ isConnected: true });
+
+    let conflictHandler: ((event: unknown) => void) | undefined;
+    vi.mocked(tauriEvent.listen).mockImplementation(async (eventName, handler) => {
+      if (eventName === "sync:conflict-detected") {
+        conflictHandler = handler as (event: unknown) => void;
+      }
+      return vi.fn();
+    });
+
+    const { result } = renderHook(() => useCloud());
+    await act(async () => {});
+
+    expect(conflictHandler).toBeDefined();
+
+    const conflictPayload = {
+      gameId: "game-crash-bandicoot",
+      gameName: "Crash Bandicoot 3: Warped",
+      localHash: "11112222",
+      localTimestamp: new Date(Date.now() - 3600000).toISOString(),
+      localSizeBytes: 131072,
+      remoteHash: "33334444",
+      remoteTimestamp: new Date().toISOString(),
+      remoteSizeBytes: 131072,
+    };
+
+    await act(async () => {
+      conflictHandler!({ payload: conflictPayload });
+    });
+
+    expect(soundEngine.playAlert).toHaveBeenCalled();
+    expect(result.current.activeConflict).toEqual(conflictPayload);
   });
 });
