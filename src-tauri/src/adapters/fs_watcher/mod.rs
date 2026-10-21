@@ -81,7 +81,7 @@ impl FsWatcherService {
         let event_sender_clone = event_sender.clone();
         let shield_clone = shield_service.clone();
 
-        tokio::spawn(async move {
+        let debouncer_task = async move {
             let mut pending_paths: HashMap<PathBuf, tokio::time::Instant> = HashMap::new();
 
             loop {
@@ -153,7 +153,13 @@ impl FsWatcherService {
                     }
                 }
             }
-        });
+        };
+
+        if let Ok(handle) = tokio::runtime::Handle::try_current() {
+            handle.spawn(debouncer_task);
+        } else {
+            tauri::async_runtime::spawn(debouncer_task);
+        }
 
         Ok(Self {
             debounce_duration,
