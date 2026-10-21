@@ -19,8 +19,9 @@ src-tauri/gen/
 *.db-journal
 *.db-wal
 *.db-shm
-backups/
-snapshots/
+/backups/
+/snapshots/
+.memcard_data/
 
 # Environment and secrets
 .env
