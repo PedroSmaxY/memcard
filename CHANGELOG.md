@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-platform automated release packaging via GitHub Actions.
 - Automated native distributable builds for macOS (Universal / Apple Silicon & Intel `.dmg`), Windows (NSIS `.exe`), and Linux (`.AppImage`, `.deb`).
 - Automated SHA-256 cryptographic checksum manifest generation (`SHA256SUMS.txt`).
+- Strict Zero Save Loss pre-restore safety backup enforcement (aborts restoration immediately if backup creation fails, preventing save corruption).
+- Mandatory baseline snapshot verification on game enrollment (rejects empty or corrupt saves with automatic database rollback).
+- Comprehensive integration test suite for backend safety invariants (`src-tauri/tests/safety_invariants.rs`).
+- Full Tauri command handlers integration test suite (`src-tauri/tests/commands_integration.rs`).
 
 ## [0.1.0] - 2026-10-21
 
