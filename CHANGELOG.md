@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Mandatory baseline snapshot verification on game enrollment (rejects empty or corrupt saves with automatic database rollback).
 - Comprehensive integration test suite for backend safety invariants (`src-tauri/tests/safety_invariants.rs`).
 - Full Tauri command handlers integration test suite (`src-tauri/tests/commands_integration.rs`).
+- Comprehensive React frontend testing infrastructure with `@testing-library/react`, `@testing-library/user-event`, and `jsdom`.
+- Complete test suites covering custom hooks (`useGames`, `useCloud`), interactive modals and drawers (`AddGameModal`, `SnapshotDrawer`, `GameCard`, `ConflictModal`, `SettingsModal`), and application root (`App.tsx`).
 
 ## [0.1.0] - 2026-10-21
 
