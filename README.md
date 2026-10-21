@@ -1,11 +1,11 @@
-# MemCard Cloud 🎮💾
+# MemCard 🎮💾
 
-[![CI](https://github.com/memcard-cloud/memcard-cloud/actions/workflows/ci.yml/badge.svg)](https://github.com/memcard-cloud/memcard-cloud/actions/workflows/ci.yml)
+[![CI](https://github.com/PedroSmaxY/memcard/actions/workflows/ci.yml/badge.svg)](https://github.com/PedroSmaxY/memcard/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tauri v2](https://img.shields.io/badge/Tauri-v2-blue.svg)](https://v2.tauri.app/)
 [![Spec-Driven Development](https://img.shields.io/badge/Methodology-SDD-purple.svg)](./specs)
 
-> An ultra-lightweight (< 40 MB RAM), neo-skeuomorphic tactile memory card utility for automated save versioning, corruption prevention, and 1-click cloud synchronization across PCs, handhelds, and retro emulators.
+> ⚡ Zero-loss game save synchronization and versioning for retro emulators and PC ports.
 
 ---
 
@@ -62,8 +62,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/memcard-cloud/memcard-cloud.git
-cd memcard-cloud
+git clone https://github.com/PedroSmaxY/memcard.git
+cd memcard
 
 # Install frontend dependencies
 pnpm install
