@@ -36,16 +36,15 @@ jobs:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 12.14.0
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: "pnpm"
+
+      - name: Enable Corepack & pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@12.14.0 --activate
 
       - name: Setup Rust Stable
         uses: dtolnay/rust-toolchain@stable
@@ -90,7 +89,7 @@ jobs:
 
             #### Distributable Assets
             - **macOS (Apple Silicon M1/M2/M3/M4):** Native `.dmg` disk image installer
-            - **Windows (x64):** NSIS setup installer (`.exe`) with Desktop & Start Menu shortcuts
+            - **Windows (x64):** NSIS setup installer (`.exe`) with Start Menu organization
             - **Linux (Steam Deck / Desktop):** Portable `.AppImage` & Debian `.deb` package with SteamOS integration
             - **Verification:** Verified cryptographic hashes in `SHA256SUMS.txt`
           generateReleaseNotes: true
