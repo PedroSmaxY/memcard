@@ -1,0 +1,33 @@
+name: "New Emulator Preset"
+description: "Submit default save paths and configurations for a new emulator"
+title: "[PRESET]: "
+labels: ["preset", "enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Help us expand the list of out-of-the-box emulator presets in MemCard Cloud!
+  - type: input
+    id: emulator_name
+    attributes:
+      label: "Emulator Name & Platform"
+      placeholder: "e.g., Ryujinx (Nintendo Switch)"
+    validations:
+      required: true
+  - type: textarea
+    id: default_paths
+    attributes:
+      label: "Default Save Directory Paths per OS"
+      placeholder: |
+        macOS: ~/Library/Application Support/Ryujinx/bis/user/save/
+        Windows: %APPDATA%/Ryujinx/bis/user/save/
+        Linux: ~/.config/Ryujinx/bis/user/save/
+    validations:
+      required: true
+  - type: input
+    id: save_pattern
+    attributes:
+      label: "Save File Extension / Pattern"
+      placeholder: "e.g., *.sav, *.srm, or directory-based"
+    validations:
+      required: true

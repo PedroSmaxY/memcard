@@ -1,0 +1,18 @@
+#!/bin/sh
+# MemCard Cloud Pre-commit Hook
+# Runs linters, formatters and tests before allowing commit
+
+echo "🎮 Running MemCard Cloud pre-commit checks..."
+
+# 1. Frontend Check
+echo "  ↳ Checking frontend types & linting..."
+pnpm typecheck || { echo "❌ Frontend typecheck failed."; exit 1; }
+pnpm test || { echo "❌ Vitest tests failed."; exit 1; }
+
+# 2. Rust Backend Check
+echo "  ↳ Checking Rust format & clippy..."
+(cd src-tauri && cargo fmt --check) || { echo "❌ cargo fmt check failed. Run 'cargo fmt' to fix."; exit 1; }
+(cd src-tauri && cargo clippy -- -D warnings) || { echo "❌ cargo clippy failed."; exit 1; }
+
+echo "✅ All pre-commit checks passed cleanly!"
+exit 0

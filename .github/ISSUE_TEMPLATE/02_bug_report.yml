@@ -1,0 +1,48 @@
+name: "Bug Report"
+description: "Report a bug or unexpected behavior in MemCard Cloud"
+title: "[BUG]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting an issue! Please provide as much context as possible.
+  - type: textarea
+    id: description
+    attributes:
+      label: "Describe the Bug"
+      description: "A clear and concise description of what happened."
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: "Operating System"
+      options:
+        - "macOS (Apple Silicon)"
+        - "macOS (Intel)"
+        - "Windows 11 / 10"
+        - "Linux / SteamOS (Steam Deck)"
+    validations:
+      required: true
+  - type: input
+    id: emulator
+    attributes:
+      label: "Emulator or Game (if applicable)"
+      placeholder: "e.g., DuckStation, PCSX2 v2.0, RetroArch 1.19"
+  - type: textarea
+    id: steps
+    attributes:
+      label: "Steps to Reproduce"
+      placeholder: |
+        1. Open emulator and save game
+        2. Watch MemCard Cloud status
+        3. See error
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: "Logs or Error Output"
+      description: "Paste logs from terminal or the MemCard Cloud log window."
+      render: shell

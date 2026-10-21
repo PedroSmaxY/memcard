@@ -1,0 +1,37 @@
+name: "Feature Specification Proposal"
+description: "Propose a new feature following the SDD (Spec-Driven Development) workflow"
+title: "[FEATURE]: "
+labels: ["enhancement", "spec"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for proposing a new feature for MemCard Cloud!
+        Please fill in the details below to help us draft or link the corresponding specification in `/specs/features/`.
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Problem or User Need"
+      description: "What gamer problem or workflow friction does this feature solve?"
+      placeholder: "e.g., When switching from PC to Steam Deck, conflict resolution requires..."
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: "Proposed Solution & UX"
+      description: "Describe how this should work from the user's perspective."
+    validations:
+      required: true
+  - type: input
+    id: spec_file
+    attributes:
+      label: "Linked Spec File"
+      description: "If already authored, path to the spec file in `specs/features/`"
+      placeholder: "specs/features/07-my-feature.spec.md"
+  - type: checkboxes
+    id: ai_collaboration
+    attributes:
+      label: "AI Collaboration Disclosure"
+      options:
+        - label: "This proposal was drafted with the assistance of an AI tool"
