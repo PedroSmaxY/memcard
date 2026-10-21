@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Complete Liquid Glass Neo-Skeuomorphic memory card UI with custom chamfer, side grip grooves, and tactile status pills.
+- Tauri IPC commands for game enrollment, platform filtering, snapshot creation, version history listing, and atomic restore.
+- System Tray lifecycle integration with background minimize-to-tray window hiding (<40 MB RAM RSS footprint).
+- Pure Web Audio API retro audio feedback synthesizer (saving triad chime, restore confirms, tactile clicks) with zero static audio files.
+- Emulator presets for DuckStation, PCSX2, Dolphin, Ryujinx, RPCS3, and RetroArch.
+- Snapshot history drawer with one-click restore and star pinning.
 - Embedded SQLite persistence engine (`SqliteDatabase`) with WAL mode, transactions, and index optimizations.
 - Implementations of `GameRepository` and `SnapshotRepository` with snapshot pinning support.
 - Streaming ZIP snapshot compression and atomic staging restoration (`create_snapshot_zip` and `restore_snapshot_zip`).

@@ -1,7 +1,7 @@
 # Feature Specification: 05 - Liquid Glass UI & System Tray Lifecycle
 
 - **ID:** `05`
-- **Status:** `Accepted`
+- **Status:** `Implemented`
 - **Author:** MemCard Cloud Team
 - **Created:** 2026-10-21
 - **Updated:** 2026-10-21
