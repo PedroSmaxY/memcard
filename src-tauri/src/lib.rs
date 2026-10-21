@@ -43,10 +43,15 @@ pub fn run() {
                 RetentionPolicy::default(),
             ));
 
+            let cloud_provider = Arc::new(adapters::cloud::GoogleDriveProvider::new(
+                "memcard-cloud-client",
+            ));
+
             app.manage(commands::AppState {
                 db,
                 snapshot_service,
                 snapshots_dir,
+                cloud_provider,
             });
 
             // Tray icon & context menu setup
@@ -94,6 +99,9 @@ pub fn run() {
             commands::snapshots::restore_snapshot,
             commands::snapshots::pin_snapshot,
             commands::cloud::get_sync_status,
+            commands::cloud::login_cloud,
+            commands::cloud::logout_cloud,
+            commands::cloud::resolve_conflict,
         ])
         .run(tauri::generate_context!())
         .expect("error while running MemCard Cloud application");
