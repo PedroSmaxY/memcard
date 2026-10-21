@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-10-21
+
+### Added
+- Multi-platform automated release packaging via GitHub Actions.
+- Automated native distributable builds for macOS (Universal / Apple Silicon & Intel `.dmg`), Windows (NSIS `.exe`), and Linux (`.AppImage`, `.deb`).
+- Automated SHA-256 cryptographic checksum manifest generation (`SHA256SUMS.txt`).
+
 ## [0.1.0] - 2026-10-21
 
 ### Added
