@@ -31,6 +31,7 @@ pub async fn add_game_handler(
         crate::adapters::db::SqliteDatabase,
         crate::adapters::db::SqliteDatabase,
     >,
+    watcher: Option<&tokio::sync::Mutex<crate::adapters::fs_watcher::FsWatcherService>>,
     request: AddGameRequest,
 ) -> Result<Game, String> {
     let path = Path::new(&request.save_path);
@@ -78,12 +79,30 @@ pub async fn add_game_handler(
         .map_err(|e| e.to_string())?
         .unwrap_or(game);
 
+    if let Some(watcher) = watcher {
+        let mut watcher_guard = watcher.lock().await;
+        let _ = watcher_guard
+            .enroll_game(crate::adapters::fs_watcher::EnrolledGameWatch {
+                game_id,
+                path: std::path::PathBuf::from(&fresh_game.save_path),
+                last_known_hash: Some(fresh_game.current_hash.clone()),
+                last_known_size: None,
+            })
+            .await;
+    }
+
     Ok(fresh_game)
 }
 
 #[tauri::command]
 pub async fn add_game(state: State<'_, AppState>, request: AddGameRequest) -> Result<Game, String> {
-    add_game_handler(&state.db, &state.snapshot_service, request).await
+    add_game_handler(
+        &state.db,
+        &state.snapshot_service,
+        Some(&state.watcher),
+        request,
+    )
+    .await
 }
 
 pub async fn list_games_handler(
@@ -100,8 +119,18 @@ pub async fn list_games(state: State<'_, AppState>) -> Result<Vec<Game>, String>
 pub async fn remove_game_handler(
     db: &crate::adapters::db::SqliteDatabase,
     snapshots_dir: &Path,
+    watcher: Option<&tokio::sync::Mutex<crate::adapters::fs_watcher::FsWatcherService>>,
     request: RemoveGameRequest,
 ) -> Result<(), String> {
+    if let Some(watcher) = watcher {
+        if let Ok(Some(game)) = db.find_by_id(request.game_id).await {
+            let mut watcher_guard = watcher.lock().await;
+            let _ = watcher_guard
+                .unenroll_game(Path::new(&game.save_path))
+                .await;
+        }
+    }
+
     if request.delete_snapshots {
         let game_dir = snapshots_dir.join(request.game_id.to_string());
         if game_dir.exists() {
@@ -122,5 +151,11 @@ pub async fn remove_game(
     state: State<'_, AppState>,
     request: RemoveGameRequest,
 ) -> Result<(), String> {
-    remove_game_handler(&state.db, &state.snapshots_dir, request).await
+    remove_game_handler(
+        &state.db,
+        &state.snapshots_dir,
+        Some(&state.watcher),
+        request,
+    )
+    .await
 }

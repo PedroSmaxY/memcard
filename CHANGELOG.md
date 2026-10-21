@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Real-time `FsWatcherService` integration wired directly into Tauri application lifecycle and state.
+- Automatic dynamic enrollment and unenrollment of game save paths upon `add_game` and `remove_game`.
+- Background Tokio event loop consuming debounced save changes, auto-creating immutable snapshots, and broadcasting push events (`watcher:save-changed` and `shield:corruption-detected`).
+- React frontend event listeners in `useGames` hook for real-time game card refreshing, audio chime playback (`playSaveChime`), and Corruption Shield alert handling (`playAlert`).
+- Integration tests validating dynamic watcher enrollment and debounced file change detection (`test_add_and_remove_game_with_watcher_enrollment`).
+
 ## [0.1.1] - 2026-10-21
 
 ### Added

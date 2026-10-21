@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import { soundEngine } from "../utils/audio";
 import { Platform } from "../features/games/presets";
 
@@ -31,6 +32,21 @@ export interface AddGamePayload {
   platform: Platform;
   savePath: string;
   emulatorPreset?: string;
+}
+
+export interface SaveChangedEventPayload {
+  gameId: string;
+  newHash: string;
+  snapshotId: string;
+  timestamp: string;
+}
+
+export interface CorruptionShieldEventPayload {
+  gameId: string;
+  gameName: string;
+  detectedSizeBytes: number;
+  previousSizeBytes: number;
+  reason: "zero_bytes" | "abnormal_shrink";
 }
 
 const isTauriEnv = () => typeof window !== "undefined" && Boolean((window as unknown as { __TAURI_INTERNALS__?: unknown }).__TAURI_INTERNALS__);
@@ -98,6 +114,60 @@ export function useGames() {
 
   useEffect(() => {
     fetchGames();
+
+    if (!isTauriEnv()) return;
+
+    let isSubscribed = true;
+    let unlistenSaveChanged: (() => void) | undefined;
+    let unlistenCorruption: (() => void) | undefined;
+
+    const setupListeners = async () => {
+      try {
+        const unlisten1 = await listen<SaveChangedEventPayload>(
+          "watcher:save-changed",
+          () => {
+            if (!isSubscribed) return;
+            soundEngine.playSaveChime();
+            fetchGames();
+          }
+        );
+        if (isSubscribed) {
+          unlistenSaveChanged = unlisten1;
+        } else {
+          unlisten1();
+        }
+
+        const unlisten2 = await listen<CorruptionShieldEventPayload>(
+          "shield:corruption-detected",
+          (event) => {
+            if (!isSubscribed) return;
+            soundEngine.playAlert();
+            setError(
+              `Corruption Shield alert for ${event.payload.gameName}: Save was blocked because ${
+                event.payload.reason === "zero_bytes"
+                  ? "file size dropped to 0 bytes."
+                  : "file size shrank abruptly by over 80%."
+              }`
+            );
+          }
+        );
+        if (isSubscribed) {
+          unlistenCorruption = unlisten2;
+        } else {
+          unlisten2();
+        }
+      } catch (err) {
+        console.error("Failed to setup Tauri push event listeners:", err);
+      }
+    };
+
+    setupListeners();
+
+    return () => {
+      isSubscribed = false;
+      if (unlistenSaveChanged) unlistenSaveChanged();
+      if (unlistenCorruption) unlistenCorruption();
+    };
   }, [fetchGames]);
 
   const addGame = async (payload: AddGamePayload) => {

@@ -3,6 +3,7 @@ pub mod commands;
 pub mod core;
 
 use adapters::db::SqliteDatabase;
+use core::ports::{GameRepository, SnapshotRepository};
 use core::services::retention::RetentionPolicy;
 use core::services::shield::ShieldService;
 use core::services::snapshot::SnapshotService;
@@ -10,7 +11,7 @@ use std::fs;
 use std::sync::Arc;
 use tauri::menu::{Menu, MenuItem};
 use tauri::tray::TrayIconBuilder;
-use tauri::Manager;
+use tauri::{Emitter, Manager};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -47,11 +48,118 @@ pub fn run() {
                 "memcard-cloud-client",
             ));
 
+            let (watch_tx, mut watch_rx) = tokio::sync::mpsc::channel(100);
+            let watcher = Arc::new(tokio::sync::Mutex::new(
+                adapters::fs_watcher::FsWatcherService::new(
+                    std::time::Duration::from_secs(3),
+                    ShieldService::default(),
+                    watch_tx,
+                )
+                .expect("Failed to initialize filesystem watcher service"),
+            ));
+
             app.manage(commands::AppState {
-                db,
-                snapshot_service,
-                snapshots_dir,
+                db: Arc::clone(&db),
+                snapshot_service: Arc::clone(&snapshot_service),
+                snapshots_dir: snapshots_dir.clone(),
                 cloud_provider,
+                watcher: Arc::clone(&watcher),
+            });
+
+            // Enroll existing games from database into watcher
+            let watcher_for_init = Arc::clone(&watcher);
+            let db_for_init = Arc::clone(&db);
+            tauri::async_runtime::spawn(async move {
+                if let Ok(games) = db_for_init.find_all().await {
+                    let mut watcher_guard = watcher_for_init.lock().await;
+                    for game in games {
+                        let _ = watcher_guard
+                            .enroll_game(adapters::fs_watcher::EnrolledGameWatch {
+                                game_id: game.id,
+                                path: std::path::PathBuf::from(&game.save_path),
+                                last_known_hash: Some(game.current_hash),
+                                last_known_size: None,
+                            })
+                            .await;
+                    }
+                }
+            });
+
+            // Spawn background task to process watcher events and emit push notifications
+            let app_handle = app.handle().clone();
+            let snapshot_service_for_watcher = Arc::clone(&snapshot_service);
+            let db_for_watcher = Arc::clone(&db);
+
+            tauri::async_runtime::spawn(async move {
+                while let Some(event) = watch_rx.recv().await {
+                    match event {
+                        adapters::fs_watcher::WatchEvent::SaveChanged {
+                            game_id,
+                            new_hash: _,
+                            size_bytes: _,
+                            is_directory: _,
+                        } => {
+                            match snapshot_service_for_watcher
+                                .create_snapshot(game_id, Some("Auto-save snapshot".to_string()))
+                                .await
+                            {
+                                Ok(snapshot) => {
+                                    let payload = serde_json::json!({
+                                        "gameId": game_id.to_string(),
+                                        "newHash": snapshot.hash,
+                                        "snapshotId": snapshot.id.to_string(),
+                                        "timestamp": snapshot.timestamp.to_rfc3339(),
+                                    });
+                                    let _ = app_handle.emit("watcher:save-changed", payload);
+                                }
+                                Err(err) => {
+                                    eprintln!(
+                                        "Failed to create auto-save snapshot for game {}: {}",
+                                        game_id, err
+                                    );
+                                }
+                            }
+                        }
+                        adapters::fs_watcher::WatchEvent::CorruptionDetected {
+                            game_id,
+                            reason,
+                            detected_size_bytes,
+                        } => {
+                            let game_name =
+                                if let Ok(Some(game)) = db_for_watcher.find_by_id(game_id).await {
+                                    game.name
+                                } else {
+                                    "Unknown Game".to_string()
+                                };
+
+                            let reason_str = match reason {
+                                core::services::shield::CorruptionReason::ZeroBytes => "zero_bytes",
+                                core::services::shield::CorruptionReason::AbnormalShrink {
+                                    ..
+                                } => "abnormal_shrink",
+                            };
+
+                            let previous_size = db_for_watcher
+                                .find_by_game_id(game_id)
+                                .await
+                                .ok()
+                                .and_then(|snaps| snaps.first().map(|s| s.size_bytes))
+                                .unwrap_or(0);
+
+                            let payload = serde_json::json!({
+                                "gameId": game_id.to_string(),
+                                "gameName": game_name,
+                                "detectedSizeBytes": detected_size_bytes,
+                                "previousSizeBytes": previous_size,
+                                "reason": reason_str,
+                            });
+                            let _ = app_handle.emit("shield:corruption-detected", payload);
+                        }
+                        adapters::fs_watcher::WatchEvent::Error { game_id, message } => {
+                            eprintln!("Watcher error for game {:?}: {}", game_id, message);
+                        }
+                    }
+                }
             });
 
             // Tray icon & context menu setup

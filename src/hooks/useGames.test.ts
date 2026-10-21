@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useGames } from "./useGames";
 import * as tauriCore from "@tauri-apps/api/core";
+import * as tauriEvent from "@tauri-apps/api/event";
 import { soundEngine } from "../utils/audio";
 
 vi.mock("@tauri-apps/api/core", () => ({
@@ -223,5 +224,71 @@ describe("useGames Hook", () => {
     ).rejects.toThrow("Disk error");
 
     expect(soundEngine.playAlert).toHaveBeenCalled();
+  });
+
+  it("handles watcher:save-changed event by playing save chime and refetching", async () => {
+    (window as unknown as { __TAURI_INTERNALS__: unknown }).__TAURI_INTERNALS__ = {};
+    vi.mocked(tauriCore.invoke).mockResolvedValue([]);
+
+    let saveChangedHandler: ((event: unknown) => void) | undefined;
+    vi.mocked(tauriEvent.listen).mockImplementation(async (eventName, handler) => {
+      if (eventName === "watcher:save-changed") {
+        saveChangedHandler = handler as (event: unknown) => void;
+      }
+      return vi.fn();
+    });
+
+    renderHook(() => useGames());
+    await act(async () => {});
+
+    expect(saveChangedHandler).toBeDefined();
+
+    await act(async () => {
+      saveChangedHandler!({
+        payload: {
+          gameId: "game-1",
+          newHash: "abc12345",
+          snapshotId: "snap-new",
+          timestamp: new Date().toISOString(),
+        },
+      });
+    });
+
+    expect(soundEngine.playSaveChime).toHaveBeenCalled();
+    expect(tauriCore.invoke).toHaveBeenCalledWith("list_games");
+  });
+
+  it("handles shield:corruption-detected event by playing alert and setting error", async () => {
+    (window as unknown as { __TAURI_INTERNALS__: unknown }).__TAURI_INTERNALS__ = {};
+    vi.mocked(tauriCore.invoke).mockResolvedValue([]);
+
+    let corruptionHandler: ((event: unknown) => void) | undefined;
+    vi.mocked(tauriEvent.listen).mockImplementation(async (eventName, handler) => {
+      if (eventName === "shield:corruption-detected") {
+        corruptionHandler = handler as (event: unknown) => void;
+      }
+      return vi.fn();
+    });
+
+    const { result } = renderHook(() => useGames());
+    await act(async () => {});
+
+    expect(corruptionHandler).toBeDefined();
+
+    await act(async () => {
+      corruptionHandler!({
+        payload: {
+          gameId: "game-1",
+          gameName: "Castlevania",
+          detectedSizeBytes: 0,
+          previousSizeBytes: 131072,
+          reason: "zero_bytes",
+        },
+      });
+    });
+
+    expect(soundEngine.playAlert).toHaveBeenCalled();
+    expect(result.current.error).toContain("Corruption Shield alert for Castlevania");
+    expect(result.current.error).toContain("file size dropped to 0 bytes");
   });
 });

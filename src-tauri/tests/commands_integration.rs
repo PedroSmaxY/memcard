@@ -50,7 +50,7 @@ async fn test_add_game_rejects_non_existent_path() -> Result<()> {
         emulator_preset: Some("duckstation".to_string()),
     };
 
-    let result = add_game_handler(&db, &snapshot_service, req).await;
+    let result = add_game_handler(&db, &snapshot_service, None, req).await;
     assert!(result.is_err());
     assert!(result.unwrap_err().contains("does not exist on disk"));
 
@@ -74,7 +74,7 @@ async fn test_add_game_rejects_zero_byte_save_and_rolls_back() -> Result<()> {
         emulator_preset: Some("snes9x".to_string()),
     };
 
-    let result = add_game_handler(&db, &snapshot_service, req).await;
+    let result = add_game_handler(&db, &snapshot_service, None, req).await;
     assert!(
         result.is_err(),
         "add_game MUST reject zero-byte save during baseline snapshot creation"
@@ -111,7 +111,9 @@ async fn test_add_game_with_valid_single_file_creates_baseline() -> Result<()> {
         emulator_preset: Some("duckstation".to_string()),
     };
 
-    let game = add_game_handler(&db, &snapshot_service, req).await.unwrap();
+    let game = add_game_handler(&db, &snapshot_service, None, req)
+        .await
+        .unwrap();
     assert_eq!(game.name, "Final Fantasy VII");
     assert_eq!(game.total_snapshots, 1);
     assert!(!game.is_directory);
@@ -142,7 +144,9 @@ async fn test_add_game_with_valid_directory_creates_baseline() -> Result<()> {
         emulator_preset: Some("ryujinx".to_string()),
     };
 
-    let game = add_game_handler(&db, &snapshot_service, req).await.unwrap();
+    let game = add_game_handler(&db, &snapshot_service, None, req)
+        .await
+        .unwrap();
     assert_eq!(game.name, "Zelda: Tears of the Kingdom");
     assert!(game.is_directory);
     assert_eq!(game.total_snapshots, 1);
@@ -160,6 +164,7 @@ async fn test_remove_game_with_and_without_deleting_snapshots() -> Result<()> {
     let game1 = add_game_handler(
         &db,
         &snapshot_service,
+        None,
         AddGameRequest {
             name: "Game 1".to_string(),
             platform: Platform::Nintendo,
@@ -177,6 +182,7 @@ async fn test_remove_game_with_and_without_deleting_snapshots() -> Result<()> {
     remove_game_handler(
         &db,
         &snapshots_dir,
+        None,
         RemoveGameRequest {
             game_id: game1.id,
             delete_snapshots: false,
@@ -199,6 +205,7 @@ async fn test_remove_game_with_and_without_deleting_snapshots() -> Result<()> {
     let game2 = add_game_handler(
         &db,
         &snapshot_service,
+        None,
         AddGameRequest {
             name: "Game 2".to_string(),
             platform: Platform::Ps2,
@@ -216,6 +223,7 @@ async fn test_remove_game_with_and_without_deleting_snapshots() -> Result<()> {
     remove_game_handler(
         &db,
         &snapshots_dir,
+        None,
         RemoveGameRequest {
             game_id: game2.id,
             delete_snapshots: true,
@@ -242,6 +250,7 @@ async fn test_snapshot_lifecycle_create_list_pin_restore() -> Result<()> {
     let game = add_game_handler(
         &db,
         &snapshot_service,
+        None,
         AddGameRequest {
             name: "Metroid Fusion".to_string(),
             platform: Platform::Nintendo,
@@ -341,4 +350,81 @@ fn test_resolve_conflict_handler_validates_actions() {
     assert!(invalid
         .unwrap_err()
         .contains("Unknown conflict resolution action"));
+}
+
+#[tokio::test]
+async fn test_add_and_remove_game_with_watcher_enrollment() -> Result<()> {
+    let (dir, db, snapshot_service, snapshots_dir) = setup_command_env().await?;
+
+    let (watch_tx, mut watch_rx) = tokio::sync::mpsc::channel(10);
+    let watcher = tokio::sync::Mutex::new(
+        memcard_cloud_lib::adapters::fs_watcher::FsWatcherService::new(
+            std::time::Duration::from_millis(100),
+            ShieldService::default(),
+            watch_tx,
+        )?,
+    );
+
+    let save_path = dir.path().join("watcher_game.sav");
+    fs::write(&save_path, b"Initial Watcher Save Content")?;
+
+    let game = add_game_handler(
+        &db,
+        &snapshot_service,
+        Some(&watcher),
+        AddGameRequest {
+            name: "Watcher Game".to_string(),
+            platform: Platform::Pc,
+            save_path: save_path.to_string_lossy().to_string(),
+            emulator_preset: None,
+        },
+    )
+    .await
+    .unwrap();
+
+    // Verify game was enrolled in watcher
+    {
+        let watcher_guard = watcher.lock().await;
+        let games_guard = watcher_guard.games.lock().await;
+        assert!(games_guard.contains_key(&save_path));
+    }
+
+    // Trigger file change and verify watcher emits SaveChanged
+    fs::write(&save_path, b"Modified Watcher Save Content - Extra Level")?;
+    {
+        let watcher_guard = watcher.lock().await;
+        watcher_guard.trigger_path_change(save_path.clone()).await;
+    }
+
+    let event = tokio::time::timeout(std::time::Duration::from_secs(2), watch_rx.recv()).await;
+    assert!(event.is_ok(), "Watcher event must be received");
+    let received = event.unwrap();
+    assert!(received.is_some());
+    match received.unwrap() {
+        memcard_cloud_lib::adapters::fs_watcher::WatchEvent::SaveChanged { game_id, .. } => {
+            assert_eq!(game_id, game.id);
+        }
+        other => panic!("Expected SaveChanged event, got: {:?}", other),
+    }
+
+    // Remove game and verify unenrollment from watcher
+    remove_game_handler(
+        &db,
+        &snapshots_dir,
+        Some(&watcher),
+        RemoveGameRequest {
+            game_id: game.id,
+            delete_snapshots: true,
+        },
+    )
+    .await
+    .unwrap();
+
+    {
+        let watcher_guard = watcher.lock().await;
+        let games_guard = watcher_guard.games.lock().await;
+        assert!(!games_guard.contains_key(&save_path));
+    }
+
+    Ok(())
 }
