@@ -72,6 +72,20 @@ pnpm install
 pnpm tauri dev
 ```
 
+### 🍎 macOS Installation & First Launch (Gatekeeper)
+
+Because MemCard Cloud is a free, open-source project without a paid Apple Developer certificate (\$99/year), macOS Gatekeeper displays an untrusted warning upon first launch.
+
+To open the application:
+1. **Graphical Method (Recommended):**
+   - In Finder, open `/Applications`.
+   - Hold the **Control** key and click (or right-click) `MemCard Cloud.app`, then select **Open**.
+   - Click **Open Anyway** in the prompt. Once opened, macOS remembers this preference permanently.
+2. **Terminal Command (Alternative):**
+   ```bash
+   xattr -cr "/Applications/MemCard Cloud.app"
+   ```
+
 ---
 
 ## 🤝 Contributing
