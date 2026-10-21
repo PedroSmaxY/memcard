@@ -34,6 +34,26 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "shortDescription": "Zero-Config Retro Game Save Management & Cloud Sync",
+    "longDescription": "MemCard Cloud monitors emulator save directories, creates atomic deduplicated snapshots with zero save loss, and provides seamless cloud sync.",
+    "copyright": "Copyright © 2026 MemCard Cloud Contributors",
+    "category": "Game",
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser"
+      }
+    },
+    "linux": {
+      "deb": {
+        "depends": [
+          "libwebkit2gtk-4.1-0",
+          "libayatana-appindicator3-1"
+        ]
+      }
+    },
+    "macOS": {
+      "minimumSystemVersion": "10.15"
+    }
   }
 }

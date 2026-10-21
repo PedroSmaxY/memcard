@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - 1-Click Google Drive Cloud Sync using zero-friction PKCE and non-sensitive `drive.file` scope.
+- Multi-platform CI/CD release packaging pipeline targeting macOS (.dmg for Apple Silicon & Intel), Windows (.exe NSIS), and Linux (.AppImage, .deb).
+- Verifiable SHA256 cryptographic manifest generation (`SHA256SUMS.txt`) attached to every published release.
 - Ephemeral HTTP loopback server capturing OAuth authorization callback with automatic cleanup.
 - Drive save storage organization under `MemCardCloud/Saves/<game_id>/<timestamp>_<hash>.zip`.
 - 3-Way Visual Conflict Resolution Modal with side-by-side local vs cloud metadata comparison.
