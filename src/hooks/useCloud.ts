@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import { soundEngine } from "../utils/audio";
 import { SyncConflictData } from "../features/sync/ConflictModal";
 
@@ -9,6 +10,12 @@ export interface CloudStatus {
   folderName: string;
   isSyncing: boolean;
   lastSyncedAt?: string;
+}
+
+export interface SyncStatusChangedPayload {
+  gameId: string;
+  status: "synced" | "syncing" | "conflict" | "error";
+  message?: string;
 }
 
 const isTauriEnv = () => typeof window !== "undefined" && Boolean((window as unknown as { __TAURI_INTERNALS__?: unknown }).__TAURI_INTERNALS__);
@@ -34,6 +41,60 @@ export function useCloud() {
 
   useEffect(() => {
     fetchStatus();
+
+    if (!isTauriEnv()) return;
+
+    let isSubscribed = true;
+    let unlistenSyncStatus: (() => void) | undefined;
+    let unlistenConflict: (() => void) | undefined;
+
+    const setupListeners = async () => {
+      try {
+        const unlisten1 = await listen<SyncStatusChangedPayload>(
+          "sync:status-changed",
+          (event) => {
+            if (!isSubscribed) return;
+            setStatus((prev) => ({
+              ...prev,
+              isSyncing: event.payload.status === "syncing",
+              lastSyncedAt:
+                event.payload.status === "synced"
+                  ? new Date().toISOString()
+                  : prev.lastSyncedAt,
+            }));
+          }
+        );
+        if (isSubscribed) {
+          unlistenSyncStatus = unlisten1;
+        } else {
+          unlisten1();
+        }
+
+        const unlisten2 = await listen<SyncConflictData>(
+          "sync:conflict-detected",
+          (event) => {
+            if (!isSubscribed) return;
+            soundEngine.playAlert();
+            setActiveConflict(event.payload);
+          }
+        );
+        if (isSubscribed) {
+          unlistenConflict = unlisten2;
+        } else {
+          unlisten2();
+        }
+      } catch (err) {
+        console.error("Failed to setup cloud push event listeners:", err);
+      }
+    };
+
+    setupListeners();
+
+    return () => {
+      isSubscribed = false;
+      if (unlistenSyncStatus) unlistenSyncStatus();
+      if (unlistenConflict) unlistenConflict();
+    };
   }, [fetchStatus]);
 
   const login = async () => {

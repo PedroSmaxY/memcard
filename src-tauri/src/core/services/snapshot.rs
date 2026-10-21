@@ -37,6 +37,15 @@ impl<G: GameRepository, S: SnapshotRepository> SnapshotService<G, S> {
         }
     }
 
+    /// Computes the absolute path to the stored ZIP archive for a given snapshot
+    pub fn get_snapshot_archive_path(&self, game_id: Uuid, snapshot: &Snapshot) -> PathBuf {
+        self.snapshots_dir.join(game_id.to_string()).join(format!(
+            "{}_{}.zip",
+            snapshot.timestamp.format("%Y%m%dT%H%M%SZ"),
+            &snapshot.hash[..8]
+        ))
+    }
+
     /// Creates an immutable `.zip` snapshot of an enrolled game save,
     /// protected by the Zero-Byte & Corruption Shield and applying the retention policy.
     pub async fn create_snapshot(&self, game_id: Uuid, label: Option<String>) -> Result<Snapshot> {

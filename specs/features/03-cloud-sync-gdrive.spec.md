@@ -33,3 +33,11 @@ Gamers switch between desktop PCs, handheld devices (Steam Deck, ROG Ally), and 
 - **Given** an authenticated session
 - **When** snapshots are synchronized
 - **Then** files are organized in the user's visible Drive under `MemCardCloud/Saves/<game_id>/<timestamp>_<hash>.zip`.
+
+### Scenario: Autonomous Background Cloud Sync Loop
+- **Given** an authenticated Google Drive session
+- **When** the filesystem watcher detects a debounced save and creates an immutable snapshot
+- **Then** the application core emits `sync:status-changed` with status `syncing`
+- **And** uploads the snapshot archive to Google Drive asynchronously
+- **And** updates the game record in SQLite to `sync_status = "synced"`
+- **And** emits `sync:status-changed` with status `synced`.

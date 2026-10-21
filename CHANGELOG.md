@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Background Tokio event loop consuming debounced save changes, auto-creating immutable snapshots, and broadcasting push events (`watcher:save-changed` and `shield:corruption-detected`).
 - React frontend event listeners in `useGames` hook for real-time game card refreshing, audio chime playback (`playSaveChime`), and Corruption Shield alert handling (`playAlert`).
 - Integration tests validating dynamic watcher enrollment and debounced file change detection (`test_add_and_remove_game_with_watcher_enrollment`).
+- Autonomous background cloud synchronization loop: automatically streams debounced save snapshot archives to Google Drive when authenticated.
+- Tauri push event broadcasting for cloud synchronization lifecycle (`sync:status-changed`) and remote divergence alerts (`sync:conflict-detected`).
+- React frontend listeners in `useCloud` and `useGames` for real-time sync progress badges, timestamp updates, and instant `ConflictModal` activation.
+- `SnapshotService::get_snapshot_archive_path` helper for clean and deterministic snapshot archive resolution.
 
 ## [0.1.1] - 2026-10-21
 
