@@ -27,7 +27,7 @@ jobs:
           components: clippy, rustfmt
 
       - name: Install Frontend Dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: Frontend Format & Lint
         run: |
@@ -69,7 +69,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install Frontend Dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: Run Frontend Tests
         run: pnpm test
