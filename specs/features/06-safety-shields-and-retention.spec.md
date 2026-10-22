@@ -2,14 +2,14 @@
 
 - **ID:** `06`
 - **Status:** `Implemented`
-- **Author:** MemCard Cloud Team
+- **Author:** MemCard Team
 - **Created:** 2026-10-21
 - **Updated:** 2026-10-21
 
 ---
 
 ## 1. Context & Motivation
-Crashes and simultaneous file writes can destroy video game saves. MemCard Cloud enforces a Zero-Byte Shield against corrupt saves, a Game Running Guard to block restoring while games are active, and an automated retention policy that preserves user-pinned milestones.
+Crashes and simultaneous file writes can destroy video game saves. MemCard enforces a Zero-Byte Shield against corrupt saves, a Game Running Guard to block restoring while games are active, and an automated retention policy that preserves user-pinned milestones.
 
 ---
 

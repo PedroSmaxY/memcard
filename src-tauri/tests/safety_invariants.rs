@@ -1,11 +1,11 @@
 use anyhow::Result;
 use chrono::Utc;
-use memcard_cloud_lib::adapters::db::SqliteDatabase;
-use memcard_cloud_lib::core::domain::{Game, Platform, SyncStatus};
-use memcard_cloud_lib::core::ports::{GameRepository, SnapshotRepository};
-use memcard_cloud_lib::core::services::retention::RetentionPolicy;
-use memcard_cloud_lib::core::services::shield::ShieldService;
-use memcard_cloud_lib::core::services::snapshot::SnapshotService;
+use memcard_lib::adapters::db::SqliteDatabase;
+use memcard_lib::core::domain::{Game, Platform, SyncStatus};
+use memcard_lib::core::ports::{GameRepository, SnapshotRepository};
+use memcard_lib::core::services::retention::RetentionPolicy;
+use memcard_lib::core::services::shield::ShieldService;
+use memcard_lib::core::services::snapshot::SnapshotService;
 use std::fs;
 use std::sync::Arc;
 use tempfile::tempdir;

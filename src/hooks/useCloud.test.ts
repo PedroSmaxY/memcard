@@ -27,7 +27,7 @@ describe("useCloud Hook", () => {
     const mockStatus = {
       isConnected: true,
       email: "player@cloud.com",
-      folderName: "MemCardCloud/Saves",
+      folderName: "MemCard/Saves",
       isSyncing: false,
       lastSyncedAt: new Date().toISOString(),
     };

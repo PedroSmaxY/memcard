@@ -1,6 +1,6 @@
 # AGENTS.md - Agent & AI Collaboration Guide
 
-This document defines operational guidelines, code standards, and invariants for all AI coding assistants (including Antigravity, Claude Code, Cursor, GitHub Copilot Workspace, and others) working in the **MemCard Cloud** repository.
+This document defines operational guidelines, code standards, and invariants for all AI coding assistants (including Antigravity, Claude Code, Cursor, GitHub Copilot Workspace, and others) working in the **MemCard** repository.
 
 ---
 

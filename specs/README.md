@@ -1,6 +1,6 @@
 # Spec-Driven Development (SDD) Guide
 
-Welcome to the **MemCard Cloud** specification registry. In this repository, specifications are versioned, living artifacts that dictate architecture, user experience, IPC contracts, and automated tests.
+Welcome to the **MemCard** specification registry. In this repository, specifications are versioned, living artifacts that dictate architecture, user experience, IPC contracts, and automated tests.
 
 ---
 

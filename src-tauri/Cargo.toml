@@ -1,12 +1,12 @@
 [package]
-name = "memcard-cloud"
+name = "memcard"
 version = "0.2.1"
 description = "Automated game save versioning, corruption prevention, and 1-click cloud sync"
-authors = ["MemCard Cloud Contributors"]
+authors = ["MemCard Contributors"]
 edition = "2021"
 
 [lib]
-name = "memcard_cloud_lib"
+name = "memcard_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

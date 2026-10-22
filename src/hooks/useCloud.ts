@@ -23,7 +23,7 @@ const isTauriEnv = () => typeof window !== "undefined" && Boolean((window as unk
 export function useCloud() {
   const [status, setStatus] = useState<CloudStatus>({
     isConnected: false,
-    folderName: "MemCardCloud/Saves",
+    folderName: "MemCard/Saves",
     isSyncing: false,
   });
   const [activeConflict, setActiveConflict] = useState<SyncConflictData | null>(null);

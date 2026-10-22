@@ -2,7 +2,7 @@
 
 - **ID:** `03`
 - **Status:** `Implemented`
-- **Author:** MemCard Cloud Team
+- **Author:** MemCard Team
 - **Created:** 2026-10-21
 - **Updated:** 2026-10-21
 
@@ -32,7 +32,7 @@ Gamers switch between desktop PCs, handheld devices (Steam Deck, ROG Ally), and 
 ### Scenario: Remote Folder Organization
 - **Given** an authenticated session
 - **When** snapshots are synchronized
-- **Then** files are organized in the user's visible Drive under `MemCardCloud/Saves/<game_id>/<timestamp>_<hash>.zip`.
+- **Then** files are organized in the user's visible Drive under `MemCard/Saves/<game_id>/<timestamp>_<hash>.zip`.
 
 ### Scenario: Autonomous Background Cloud Sync Loop
 - **Given** an authenticated Google Drive session

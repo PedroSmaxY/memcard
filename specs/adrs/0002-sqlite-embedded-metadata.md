@@ -7,7 +7,7 @@
 ---
 
 ## Context
-MemCard Cloud needs to store configured games, save file/directory paths, emulator presets, immutable snapshot manifests, SHA-256 hashes, sync states, and user preferences. The storage mechanism must guarantee atomic transactions, ACID compliance, instantaneous historical queries per game, and zero risk of corrupting database records upon sudden OS shutdown or game crash.
+MemCard needs to store configured games, save file/directory paths, emulator presets, immutable snapshot manifests, SHA-256 hashes, sync states, and user preferences. The storage mechanism must guarantee atomic transactions, ACID compliance, instantaneous historical queries per game, and zero risk of corrupting database records upon sudden OS shutdown or game crash.
 
 ---
 
@@ -16,7 +16,7 @@ We adopt **embedded SQLite** via the synchronous `rusqlite` crate wrapped in a d
 
 1. **Schema & Migrations:** Migrations are embedded within the Rust binary and applied sequentially on startup.
 2. **ACID Transactions:** New snapshot creation, hash updates, and conflict resolutions occur within atomic transactions.
-3. **Location:** Placed in the standard application data directory (`$APP_DATA/memcard-cloud/storage.db`).
+3. **Location:** Placed in the standard application data directory (`$APP_DATA/memcard/storage.db`).
 
 ---
 

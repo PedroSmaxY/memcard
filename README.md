@@ -17,7 +17,7 @@
   - **Immutable Snapshots:** Guarantees atomic `.zip` snapshots before any cloud sync or local overwrite.
 - **⚡ 1-Click Cloud Sync (Google Drive):**
   - Instant login using native PKCE desktop OAuth via an ephemeral loopback server.
-  - Uses the non-sensitive `drive.file` scope (zero security friction; touches only its dedicated folder: `MemCardCloud/Saves`).
+  - Uses the non-sensitive `drive.file` scope (zero security friction; touches only its dedicated folder: `MemCard/Saves`).
 - **🎛️ 3-Way Visual Conflict Resolution:**
   - Clear side-by-side modal allowing users to keep local, use cloud, or duplicate into a new branch/slot.
 - **🕹️ Console-Themed Tactile UI:**
@@ -74,16 +74,16 @@ pnpm tauri dev
 
 ### 🍎 macOS Installation & First Launch (Gatekeeper)
 
-Because MemCard Cloud is a free, open-source project without a paid Apple Developer certificate (\$99/year), macOS Gatekeeper displays an untrusted warning upon first launch.
+Because MemCard is a free, open-source project without a paid Apple Developer certificate (\$99/year), macOS Gatekeeper displays an untrusted warning upon first launch.
 
 To open the application:
 1. **Graphical Method (Recommended):**
    - In Finder, open `/Applications`.
-   - Hold the **Control** key and click (or right-click) `MemCard Cloud.app`, then select **Open**.
+   - Hold the **Control** key and click (or right-click) `MemCard.app`, then select **Open**.
    - Click **Open Anyway** in the prompt. Once opened, macOS remembers this preference permanently.
 2. **Terminal Command (Alternative):**
    ```bash
-   xattr -cr "/Applications/MemCard Cloud.app"
+   xattr -cr "/Applications/MemCard.app"
    ```
 
 ---

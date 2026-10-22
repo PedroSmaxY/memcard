@@ -1,5 +1,5 @@
 name: "Bug Report"
-description: "Report a bug or unexpected behavior in MemCard Cloud"
+description: "Report a bug or unexpected behavior in MemCard"
 title: "[BUG]: "
 labels: ["bug"]
 body:
@@ -36,7 +36,7 @@ body:
       label: "Steps to Reproduce"
       placeholder: |
         1. Open emulator and save game
-        2. Watch MemCard Cloud status
+        2. Watch MemCard status
         3. See error
     validations:
       required: true
@@ -44,5 +44,5 @@ body:
     id: logs
     attributes:
       label: "Logs or Error Output"
-      description: "Paste logs from terminal or the MemCard Cloud log window."
+      description: "Paste logs from terminal or the MemCard log window."
       render: shell

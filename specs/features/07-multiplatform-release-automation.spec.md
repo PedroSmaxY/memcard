@@ -2,21 +2,21 @@
 
 - **ID:** `07`
 - **Status:** `Implemented`
-- **Author:** MemCard Cloud Team
+- **Author:** MemCard Team
 - **Created:** 2026-10-21
 - **Updated:** 2026-10-21
 
 ---
 
 ## 1. Context & Motivation
-To provide seamless installation for end users across desktop gaming environments (macOS, Windows, Steam Deck / Linux), MemCard Cloud provides automated CI/CD release packaging. Every new semantic release automatically compiles native distributables (`.dmg`, `.exe`, `.AppImage`, `.deb`) and calculates verifiable cryptographic SHA-256 manifests.
+To provide seamless installation for end users across desktop gaming environments (macOS, Windows, Steam Deck / Linux), MemCard provides automated CI/CD release packaging. Every new semantic release automatically compiles native distributables (`.dmg`, `.exe`, `.AppImage`, `.deb`) and calculates verifiable cryptographic SHA-256 manifests.
 
 ---
 
 ## 2. User Stories
 - **As an** end user playing on Mac, Windows PC, or Steam Deck,
 - **I want** pre-packaged, native executable installers and portables attached directly to each release,
-- **So that** I can install or run MemCard Cloud with one click without compiling from source.
+- **So that** I can install or run MemCard with one click without compiling from source.
 
 ---
 

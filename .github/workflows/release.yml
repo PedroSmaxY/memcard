@@ -81,11 +81,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: ${{ inputs.tag_name || github.ref_name }}
-          releaseName: "MemCard Cloud ${{ inputs.tag_name || github.ref_name }}"
+          releaseName: "MemCard ${{ inputs.tag_name || github.ref_name }}"
           releaseBody: |
             ### Zero-Config Retro Game Save Management & Cloud Sync
 
-            MemCard Cloud automates emulator save monitoring, creates atomic local snapshots with Zero Save Loss, and provides seamless 1-click cloud sync across Steam Deck, PC, and macOS.
+            MemCard automates emulator save monitoring, creates atomic local snapshots with Zero Save Loss, and provides seamless 1-click cloud sync across Steam Deck, PC, and macOS.
 
             #### Distributable Assets
             - **macOS (Apple Silicon M1/M2/M3/M4):** Native `.dmg` disk image installer (Ad-hoc signed)
@@ -94,9 +94,9 @@ jobs:
             - **Verification:** Verified cryptographic hashes in `SHA256SUMS.txt`
 
             #### 🍎 Note for macOS Users (Unnotarized Open-Source App)
-            Because MemCard Cloud is a free community open-source project without a paid Apple Developer certificate, macOS Gatekeeper may show an untrusted warning upon first launch.
-            - **Easy GUI Method:** In Finder `/Applications`, hold **Control** and click (or right-click) `MemCard Cloud.app` -> choose **Open** -> click **Open Anyway**.
-            - **Terminal Alternative:** `xattr -cr /Applications/MemCard\ Cloud.app`
+            Because MemCard is a free community open-source project without a paid Apple Developer certificate, macOS Gatekeeper may show an untrusted warning upon first launch.
+            - **Easy GUI Method:** In Finder `/Applications`, hold **Control** and click (or right-click) `MemCard.app` -> choose **Open** -> click **Open Anyway**.
+            - **Terminal Alternative:** `xattr -cr /Applications/MemCard.app`
           generateReleaseNotes: true
           releaseDraft: false
           prerelease: false

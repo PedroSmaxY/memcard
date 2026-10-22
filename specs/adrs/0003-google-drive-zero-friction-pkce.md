@@ -20,7 +20,7 @@ A major barrier for desktop sync utilities is complex cloud onboarding (requirin
    - Rust exchanges the code for `access_token` and `refresh_token`, terminates the loopback server, and returns a sleek "Success" page to the browser.
 2. **Non-Sensitive Scope (`drive.file`):**
    - We request only `https://www.googleapis.com/auth/drive.file`.
-   - **Crucial Benefit:** Google classifies `drive.file` as non-sensitive. It grants access solely to files created or opened by MemCard Cloud in `My Drive/MemCardCloud/Saves`.
+   - **Crucial Benefit:** Google classifies `drive.file` as non-sensitive. It grants access solely to files created or opened by MemCard in `My Drive/MemCard/Saves`.
    - Bypasses annual third-party CASA security verification and eliminates red "Dangerous/Unverified App" warnings.
 
 ---
@@ -29,6 +29,6 @@ A major barrier for desktop sync utilities is complex cloud onboarding (requirin
 - **Positive:**
   - True 1-click user onboarding.
   - Zero Google Cloud Console complexity for gamers.
-  - Least-privilege security principle: MemCard Cloud can never access personal photos, emails, or personal Drive documents.
+  - Least-privilege security principle: MemCard can never access personal photos, emails, or personal Drive documents.
 - **Negative:**
   - Requires handling OS firewall dialogs on Windows for the local loopback port (standard for desktop apps).

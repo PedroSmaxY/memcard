@@ -1,8 +1,8 @@
 #!/bin/sh
-# MemCard Cloud Pre-commit Hook
+# MemCard Pre-commit Hook
 # Runs linters, formatters and tests before allowing commit
 
-echo "🎮 Running MemCard Cloud pre-commit checks..."
+echo "🎮 Running MemCard pre-commit checks..."
 
 # 1. Frontend Check
 echo "  ↳ Checking frontend types & linting..."

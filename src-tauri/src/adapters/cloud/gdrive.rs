@@ -29,7 +29,7 @@ pub struct GoogleUser {
 }
 
 /// Google Drive Cloud Storage Provider with non-sensitive `drive.file` scope
-/// organizing files under `MemCardCloud/Saves/<game_id>/<timestamp>_<hash>.zip`.
+/// organizing files under `MemCard/Saves/<game_id>/<timestamp>_<hash>.zip`.
 pub struct GoogleDriveProvider {
     client_id: String,
     current_user: RwLock<Option<GoogleUser>>,
@@ -104,7 +104,7 @@ impl GoogleDriveProvider {
         let code = Self::extract_code_from_http_request(&request_str)
             .context("Could not extract authorization code from OAuth callback")?;
 
-        let html = "<!DOCTYPE html><html><body style='background:#12141a;color:#34d399;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;'><h2>MemCard Cloud Connected! You may close this tab.</h2></body></html>";
+        let html = "<!DOCTYPE html><html><body style='background:#12141a;color:#34d399;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;'><h2>MemCard Connected! You may close this tab.</h2></body></html>";
         let response = format!(
             "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
             html.len(),
@@ -180,7 +180,7 @@ impl CloudStorageProvider for GoogleDriveProvider {
         let file_id = Uuid::new_v4().to_string();
 
         let remote_path = format!(
-            "MemCardCloud/Saves/{}/{}_{}.zip",
+            "MemCard/Saves/{}/{}_{}.zip",
             game.id,
             snapshot.timestamp.format("%Y%m%dT%H%M%SZ"),
             &snapshot.hash[..8]

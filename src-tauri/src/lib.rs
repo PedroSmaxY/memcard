@@ -47,7 +47,7 @@ pub fn run() {
             ));
 
             let cloud_provider = Arc::new(adapters::cloud::GoogleDriveProvider::new(
-                "memcard-cloud-client",
+                "memcard-client",
             ));
 
             let (watch_tx, mut watch_rx) = tokio::sync::mpsc::channel(100);
@@ -131,7 +131,7 @@ pub fn run() {
                                         let _ = app_handle
                                             .notification()
                                             .builder()
-                                            .title("MemCard Cloud")
+                                            .title("MemCard")
                                             .body(format!("Save protected for {}", game_name))
                                             .show();
                                     }
@@ -274,7 +274,7 @@ pub fn run() {
 
             let _tray = TrayIconBuilder::new()
                 .menu(&menu)
-                .tooltip("MemCard Cloud")
+                .tooltip("MemCard")
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "quit" => {
                         app.exit(0);
@@ -319,5 +319,5 @@ pub fn run() {
             commands::set_notifications_enabled,
         ])
         .run(tauri::generate_context!())
-        .expect("error while running MemCard Cloud application");
+        .expect("error while running MemCard application");
 }

@@ -1,17 +1,17 @@
 use anyhow::Result;
-use memcard_cloud_lib::adapters::db::SqliteDatabase;
-use memcard_cloud_lib::commands::cloud::{resolve_conflict_handler, ResolveConflictRequest};
-use memcard_cloud_lib::commands::games::{
+use memcard_lib::adapters::db::SqliteDatabase;
+use memcard_lib::commands::cloud::{resolve_conflict_handler, ResolveConflictRequest};
+use memcard_lib::commands::games::{
     add_game_handler, list_games_handler, remove_game_handler, AddGameRequest, RemoveGameRequest,
 };
-use memcard_cloud_lib::commands::snapshots::{
+use memcard_lib::commands::snapshots::{
     create_snapshot_handler, list_snapshots_handler, pin_snapshot_handler,
     restore_snapshot_handler, CreateSnapshotRequest,
 };
-use memcard_cloud_lib::core::domain::Platform;
-use memcard_cloud_lib::core::services::retention::RetentionPolicy;
-use memcard_cloud_lib::core::services::shield::ShieldService;
-use memcard_cloud_lib::core::services::snapshot::SnapshotService;
+use memcard_lib::core::domain::Platform;
+use memcard_lib::core::services::retention::RetentionPolicy;
+use memcard_lib::core::services::shield::ShieldService;
+use memcard_lib::core::services::snapshot::SnapshotService;
 use std::fs;
 use std::sync::Arc;
 use tempfile::tempdir;
@@ -357,13 +357,12 @@ async fn test_add_and_remove_game_with_watcher_enrollment() -> Result<()> {
     let (dir, db, snapshot_service, snapshots_dir) = setup_command_env().await?;
 
     let (watch_tx, mut watch_rx) = tokio::sync::mpsc::channel(10);
-    let watcher = tokio::sync::Mutex::new(
-        memcard_cloud_lib::adapters::fs_watcher::FsWatcherService::new(
+    let watcher =
+        tokio::sync::Mutex::new(memcard_lib::adapters::fs_watcher::FsWatcherService::new(
             std::time::Duration::from_millis(100),
             ShieldService::default(),
             watch_tx,
-        )?,
-    );
+        )?);
 
     let save_path = dir.path().join("watcher_game.sav");
     fs::write(&save_path, b"Initial Watcher Save Content")?;
@@ -401,7 +400,7 @@ async fn test_add_and_remove_game_with_watcher_enrollment() -> Result<()> {
     let received = event.unwrap();
     assert!(received.is_some());
     match received.unwrap() {
-        memcard_cloud_lib::adapters::fs_watcher::WatchEvent::SaveChanged { game_id, .. } => {
+        memcard_lib::adapters::fs_watcher::WatchEvent::SaveChanged { game_id, .. } => {
             assert_eq!(game_id, game.id);
         }
         other => panic!("Expected SaveChanged event, got: {:?}", other),

@@ -2,14 +2,14 @@
 
 - **ID:** `05`
 - **Status:** `Implemented`
-- **Author:** MemCard Cloud Team
+- **Author:** MemCard Team
 - **Created:** 2026-10-21
 - **Updated:** 2026-10-21
 
 ---
 
 ## 1. Context & Motivation
-Gamers value immersion and aesthetics. MemCard Cloud departs from sterile corporate flat design, using a tactile neo-skeuomorphic translucent dark glass (*liquid glass*) memory card silhouette. It must run unobtrusively in the background (< 40 MB RAM) with an OS tray icon and Gamer Mode notifications.
+Gamers value immersion and aesthetics. MemCard departs from sterile corporate flat design, using a tactile neo-skeuomorphic translucent dark glass (*liquid glass*) memory card silhouette. It must run unobtrusively in the background (< 40 MB RAM) with an OS tray icon and Gamer Mode notifications.
 
 ---
 

@@ -55,7 +55,7 @@ pub async fn get_sync_status(state: State<'_, AppState>) -> Result<CloudStatusDt
     Ok(CloudStatusDto {
         is_connected: is_auth,
         email: user.map(|u| u.email),
-        folder_name: "MemCardCloud/Saves".to_string(),
+        folder_name: "MemCard/Saves".to_string(),
         is_syncing: false,
         last_synced_at: if is_auth {
             Some(chrono::Utc::now().to_rfc3339())

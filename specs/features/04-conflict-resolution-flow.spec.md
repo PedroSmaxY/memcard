@@ -2,7 +2,7 @@
 
 - **ID:** `04`
 - **Status:** `Implemented`
-- **Author:** MemCard Cloud Team
+- **Author:** MemCard Team
 - **Created:** 2026-10-21
 - **Updated:** 2026-10-21
 

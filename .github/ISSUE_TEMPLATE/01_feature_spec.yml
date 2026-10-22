@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for proposing a new feature for MemCard Cloud!
+        Thanks for proposing a new feature for MemCard!
         Please fill in the details below to help us draft or link the corresponding specification in `/specs/features/`.
   - type: textarea
     id: problem

@@ -1,6 +1,6 @@
 # Claude Code Instructions
 
-Please refer to [AGENTS.md](./AGENTS.md) for the complete operational manual, architecture guidelines, and engineering invariants of the **MemCard Cloud** project.
+Please refer to [AGENTS.md](./AGENTS.md) for the complete operational manual, architecture guidelines, and engineering invariants of the **MemCard** project.
 
 Key rules to follow at all times:
 - Spec-First Development (check `/specs` before modifying features).

@@ -1,6 +1,6 @@
-# Contributing to MemCard Cloud
+# Contributing to MemCard
 
-Thank you for your interest in contributing to **MemCard Cloud**! We follow **Spec-Driven Development (SDD)**, strict code quality standards, and full transparency in AI collaboration.
+Thank you for your interest in contributing to **MemCard**! We follow **Spec-Driven Development (SDD)**, strict code quality standards, and full transparency in AI collaboration.
 
 ---
 

@@ -7,7 +7,7 @@
 ---
 
 ## Context
-MemCard Cloud needs to run silently in the background while users play resource-intensive games and emulators. Memory footprint must be constrained strictly to under 40 MB of RAM, with zero UI freezing during disk I/O, hashing, or cloud synchronization. Furthermore, the application requires a custom frameless window (`decorations: false`, `transparent: true`) replicating a tactile neo-skeuomorphic translucent dark glass (*liquid glass*) memory card.
+MemCard needs to run silently in the background while users play resource-intensive games and emulators. Memory footprint must be constrained strictly to under 40 MB of RAM, with zero UI freezing during disk I/O, hashing, or cloud synchronization. Furthermore, the application requires a custom frameless window (`decorations: false`, `transparent: true`) replicating a tactile neo-skeuomorphic translucent dark glass (*liquid glass*) memory card.
 
 ---
 
