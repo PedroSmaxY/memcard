@@ -7,7 +7,8 @@ interface GameCardProps {
   game: Game;
   onOpenHistory: (game: Game) => void;
   onCreateSnapshot: (gameId: string) => Promise<void>;
-  onRemoveGame: (gameId: string) => Promise<void>;
+  onRemoveGame?: (gameId: string) => Promise<void>;
+  onRequestDelete?: (game: Game) => void;
 }
 
 export const GameCard: React.FC<GameCardProps> = ({
@@ -15,6 +16,7 @@ export const GameCard: React.FC<GameCardProps> = ({
   onOpenHistory,
   onCreateSnapshot,
   onRemoveGame,
+  onRequestDelete,
 }) => {
   const [isCreatingSnapshot, setIsCreatingSnapshot] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -31,10 +33,15 @@ export const GameCard: React.FC<GameCardProps> = ({
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    soundEngine.playClick();
+    if (onRequestDelete) {
+      onRequestDelete(game);
+      return;
+    }
     if (window.confirm(`Stop tracking and remove "${game.name}"?`)) {
       setIsDeleting(true);
       try {
-        await onRemoveGame(game.id);
+        await onRemoveGame?.(game.id);
       } finally {
         setIsDeleting(false);
       }

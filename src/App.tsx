@@ -14,6 +14,7 @@ import { useGames, Game } from "./hooks/useGames";
 import { useCloud } from "./hooks/useCloud";
 import { GameCard } from "./features/games/GameCard";
 import { AddGameModal } from "./features/games/AddGameModal";
+import { DeleteGameModal } from "./features/games/DeleteGameModal";
 import { SnapshotDrawer } from "./features/snapshots/SnapshotDrawer";
 import { SettingsModal } from "./features/settings/SettingsModal";
 import { ConflictModal } from "./features/sync/ConflictModal";
@@ -24,6 +25,7 @@ export default function App() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [selectedGameForHistory, setSelectedGameForHistory] = useState<Game | null>(null);
+  const [gameToDelete, setGameToDelete] = useState<Game | null>(null);
 
   const {
     games,
@@ -66,24 +68,64 @@ export default function App() {
     }
   };
 
+  const handleCloseWindow = async () => {
+    soundEngine.playClick();
+    try {
+      const { getCurrentWindow } = await import("@tauri-apps/api/window");
+      await getCurrentWindow().hide();
+    } catch {
+      // In web / non-tauri mode, no-op
+    }
+  };
+
+  const handleMinimizeWindow = async () => {
+    soundEngine.playClick();
+    try {
+      const { getCurrentWindow } = await import("@tauri-apps/api/window");
+      await getCurrentWindow().minimize();
+    } catch {
+      // In web / non-tauri mode, no-op
+    }
+  };
+
   return (
-    <main className="w-screen h-screen p-4 flex items-center justify-center bg-transparent select-none">
-      {/* Neo-Skeuomorphic Memory Card Outer Shell */}
-      <div className="w-[420px] h-[580px] liquid-glass memory-card-clip rounded-2xl flex flex-col overflow-hidden text-neutral-100 shadow-2xl relative border border-white/10">
+    <main className="w-screen h-screen p-2.5 flex items-center justify-center bg-transparent select-none">
+      {/* Neo-Skeuomorphic Memory Card Outer Shell - Organic Clean Rounded Borders */}
+      <div className="w-full h-full liquid-glass rounded-2xl flex flex-col overflow-hidden text-neutral-100 shadow-2xl relative border border-white/12">
         
         {/* Custom Draggable Titlebar / Memory Card Header */}
         <header 
           data-tauri-drag-region 
-          className="h-12 px-4 flex items-center justify-between border-b border-white/10 bg-black/20 cursor-grab active:cursor-grabbing"
+          className="h-12 px-3.5 flex items-center justify-between border-b border-white/10 bg-black/30 cursor-grab active:cursor-grabbing select-none shrink-0"
         >
-          <div className="flex items-center gap-2">
-            <HardDrive className="w-4 h-4 text-emerald-400" />
-            <span className="text-xs font-semibold tracking-wider uppercase text-neutral-300">
-              MemCard 01 // Cloud
-            </span>
+          <div className="flex items-center gap-3">
+            {/* macOS Native Style Traffic Light Window Controls */}
+            <div className="flex items-center gap-1.5 mr-1" data-tauri-drag-region="false">
+              <button 
+                onClick={handleCloseWindow}
+                className="w-3 h-3 rounded-full bg-[#ff5f56] hover:brightness-110 active:brightness-90 flex items-center justify-center text-[7px] text-neutral-950 font-bold opacity-85 hover:opacity-100 transition-all cursor-pointer shadow-sm group"
+                title="Hide to System Tray"
+              >
+                <span className="opacity-0 group-hover:opacity-100 leading-none">✕</span>
+              </button>
+              <button 
+                onClick={handleMinimizeWindow}
+                className="w-3 h-3 rounded-full bg-[#ffbd2e] hover:brightness-110 active:brightness-90 flex items-center justify-center text-[7px] text-neutral-950 font-bold opacity-85 hover:opacity-100 transition-all cursor-pointer shadow-sm group"
+                title="Minimize Window"
+              >
+                <span className="opacity-0 group-hover:opacity-100 leading-none">—</span>
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2 pointer-events-none">
+              <HardDrive className="w-4 h-4 text-emerald-400" />
+              <span className="text-xs font-semibold tracking-wider uppercase text-neutral-200">
+                MemCard 01 // Cloud
+              </span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" data-tauri-drag-region="false">
             <button 
               onClick={handleCloudToggle}
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium transition-all ${
@@ -133,21 +175,14 @@ export default function App() {
               soundEngine.playClick();
               setIsAddModalOpen(true);
             }}
-            className="p-1 rounded-md bg-white/10 hover:bg-emerald-500 hover:text-neutral-950 text-neutral-200 transition-colors"
+            className="p-1.5 rounded-md bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white transition-colors"
             title="Add Game"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="w-4 h-4" />
           </button>
         </nav>
 
-        {/* Tactile Grip Grooves (Side detail) */}
-        <div className="absolute right-1 top-20 flex flex-col gap-1.5 pointer-events-none opacity-40">
-          <div className="w-1.5 h-6 tactile-groove rounded-full" />
-          <div className="w-1.5 h-6 tactile-groove rounded-full" />
-          <div className="w-1.5 h-6 tactile-groove rounded-full" />
-        </div>
-
-        {/* Main Content: Games / Slots Area */}
+        {/* Main Content: Games / Slots Area (Side grip grooves removed) */}
         <section className="flex-1 p-3 overflow-y-auto flex flex-col">
           {isLoading ? (
             <div className="flex-1 flex items-center justify-center text-xs text-neutral-400">
@@ -186,8 +221,8 @@ export default function App() {
                   onCreateSnapshot={async (id) => {
                     await createSnapshot(id);
                   }}
-                  onRemoveGame={async (id) => {
-                    await removeGame(id);
+                  onRequestDelete={(g) => {
+                    setGameToDelete(g);
                   }}
                 />
               ))}
@@ -242,6 +277,15 @@ export default function App() {
           initialPlatform={selectedPlatform}
           onClose={() => setIsAddModalOpen(false)}
           onAdd={addGame}
+        />
+
+        <DeleteGameModal
+          isOpen={Boolean(gameToDelete)}
+          game={gameToDelete}
+          onClose={() => setGameToDelete(null)}
+          onConfirm={async (id, deleteSnapshots) => {
+            await removeGame(id, deleteSnapshots);
+          }}
         />
 
         <SnapshotDrawer
