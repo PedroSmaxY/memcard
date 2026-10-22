@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { EMULATOR_PRESETS } from "./presets";
+import { EMULATOR_PRESETS, fetchCommunityPresets } from "./presets";
 
 describe("Emulator Presets", () => {
   it("contains major emulator configurations", () => {
@@ -8,7 +8,11 @@ describe("Emulator Presets", () => {
     expect(ids).toContain("pcsx2");
     expect(ids).toContain("dolphin");
     expect(ids).toContain("ryujinx");
-    expect(ids).toContain("retroarch-ps1");
+    expect(ids).toContain("retroarch");
+    expect(ids).toContain("citra");
+    expect(ids).toContain("cemu");
+    expect(ids).toContain("elden_ring");
+    expect(ids).toContain("hollow_knight");
   });
 
   it("assigns valid platforms to each preset", () => {
@@ -18,5 +22,11 @@ describe("Emulator Presets", () => {
       expect(preset.suggestedFileName.length).toBeGreaterThan(0);
       expect(preset.name.length).toBeGreaterThan(0);
     }
+  });
+
+  it("fetches community presets gracefully in fallback mode", async () => {
+    const presets = await fetchCommunityPresets();
+    expect(presets.length).toBeGreaterThanOrEqual(10);
+    expect(presets.some((p) => p.id === "duckstation")).toBe(true);
   });
 });

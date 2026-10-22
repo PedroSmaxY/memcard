@@ -12,12 +12,14 @@ import {
 import { Platform } from "./features/games/presets";
 import { useGames, Game } from "./hooks/useGames";
 import { useCloud } from "./hooks/useCloud";
+import { useUpdater } from "./hooks/useUpdater";
 import { GameCard } from "./features/games/GameCard";
 import { AddGameModal } from "./features/games/AddGameModal";
 import { DeleteGameModal } from "./features/games/DeleteGameModal";
 import { SnapshotDrawer } from "./features/snapshots/SnapshotDrawer";
 import { SettingsModal } from "./features/settings/SettingsModal";
 import { ConflictModal } from "./features/sync/ConflictModal";
+import { UpdateBanner } from "./features/updater/UpdateBanner";
 import { soundEngine } from "./utils/audio";
 
 export type PlatformFilter = "all" | Platform;
@@ -48,6 +50,20 @@ export default function App() {
     logout: logoutCloud,
     resolveConflict,
   } = useCloud();
+
+  const {
+    available: updateAvailable,
+    version: updateVersion,
+    body: updateBody,
+    isChecking: isCheckingUpdates,
+    isDownloading: isDownloadingUpdate,
+    progress: updateProgress,
+    error: updateError,
+    statusMessage: updateStatusMessage,
+    checkForUpdates,
+    installUpdateAndRelaunch,
+    dismiss: dismissUpdate,
+  } = useUpdater();
 
   const filteredGames = selectedPlatform === "all"
     ? games
@@ -142,6 +158,19 @@ export default function App() {
           <Plus className="w-4 h-4" />
         </button>
       </nav>
+
+      {/* In-App Auto-Updater Notification Banner */}
+      <UpdateBanner
+        available={updateAvailable}
+        version={updateVersion}
+        body={updateBody}
+        isDownloading={isDownloadingUpdate}
+        progress={updateProgress}
+        statusMessage={updateStatusMessage}
+        error={updateError}
+        onInstall={installUpdateAndRelaunch}
+        onDismiss={dismissUpdate}
+      />
 
       {/* Main Content: Games / Slots Area */}
       <section className="flex-1 p-3 overflow-y-auto flex flex-col">
@@ -262,6 +291,12 @@ export default function App() {
       <SettingsModal
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
+        onCheckForUpdates={() => checkForUpdates(true)}
+        isCheckingUpdates={isCheckingUpdates}
+        updateAvailable={updateAvailable}
+        updateVersion={updateVersion}
+        updateStatusMessage={updateStatusMessage}
+        onInstallUpdate={installUpdateAndRelaunch}
       />
 
       <ConflictModal

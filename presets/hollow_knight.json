@@ -1,0 +1,21 @@
+{
+  "id": "hollow_knight",
+  "name": "Hollow Knight",
+  "platform": "pc",
+  "saveType": "file",
+  "fileExtensions": [".dat"],
+  "defaultPaths": {
+    "macos": [
+      "~/Library/Application Support/unity.Team Cherry.Hollow Knight/user1.dat"
+    ],
+    "windows": [
+      "%USERPROFILE%/AppData/LocalLow/Team Cherry/Hollow Knight/user1.dat"
+    ],
+    "linux": [
+      "~/.config/unity3d/Team Cherry/Hollow Knight/user1.dat"
+    ]
+  },
+  "description": "Team Cherry Hollow Knight save file (user1.dat)",
+  "author": "MemCard Community",
+  "version": "1.0.0"
+}

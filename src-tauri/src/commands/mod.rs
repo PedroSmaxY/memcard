@@ -1,5 +1,6 @@
 pub mod cloud;
 pub mod games;
+pub mod presets;
 pub mod snapshots;
 
 use crate::adapters::cloud::GoogleDriveProvider;

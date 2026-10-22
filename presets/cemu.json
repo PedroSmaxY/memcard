@@ -1,0 +1,22 @@
+{
+  "id": "cemu",
+  "name": "Cemu",
+  "platform": "nintendo",
+  "saveType": "directory",
+  "fileExtensions": [],
+  "defaultPaths": {
+    "macos": [
+      "~/Library/Application Support/Cemu/mlc01/usr/save"
+    ],
+    "windows": [
+      "%USERPROFILE%/Documents/Cemu/mlc01/usr/save"
+    ],
+    "linux": [
+      "~/.local/share/Cemu/mlc01/usr/save",
+      "~/.var/app/info.cemu.Cemu/data/Cemu/mlc01/usr/save"
+    ]
+  },
+  "description": "Nintendo Wii U MLC save storage directory",
+  "author": "MemCard Community",
+  "version": "1.0.0"
+}

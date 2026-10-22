@@ -1,0 +1,23 @@
+{
+  "id": "duckstation",
+  "name": "DuckStation",
+  "platform": "ps1",
+  "saveType": "file",
+  "fileExtensions": [".mcd", ".mcr"],
+  "defaultPaths": {
+    "macos": [
+      "~/Library/Application Support/DuckStation/memcards/shared_card_1.mcd",
+      "~/.local/share/duckstation/memcards/shared_card_1.mcd"
+    ],
+    "windows": [
+      "%USERPROFILE%/Documents/DuckStation/memcards/shared_card_1.mcd"
+    ],
+    "linux": [
+      "~/.local/share/duckstation/memcards/shared_card_1.mcd",
+      "~/.var/app/org.duckstation.DuckStation/data/duckstation/memcards/shared_card_1.mcd"
+    ]
+  },
+  "description": "Sony PlayStation 1 memory card 1 (.mcd / .mcr)",
+  "author": "MemCard Community",
+  "version": "1.0.0"
+}

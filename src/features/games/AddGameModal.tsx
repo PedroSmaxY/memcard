@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { X, Gamepad2, Sparkles, FolderOpen } from "lucide-react";
-import { Platform, EMULATOR_PRESETS } from "./presets";
+import { X, Gamepad2, Sparkles, FolderOpen, CheckCircle, FolderArchive } from "lucide-react";
+import { Platform, EmulatorPreset, BUILTIN_PRESETS, fetchCommunityPresets, openModsFolder } from "./presets";
 import { AddGamePayload } from "../../hooks/useGames";
 import { soundEngine } from "../../utils/audio";
 import { open } from "@tauri-apps/plugin-dialog";
@@ -18,12 +18,23 @@ export const AddGameModal: React.FC<AddGameModalProps> = ({
   onClose,
   onAdd,
 }) => {
+  const [presets, setPresets] = useState<EmulatorPreset[]>(BUILTIN_PRESETS);
   const [name, setName] = useState("");
   const [platform, setPlatform] = useState<Platform>(initialPlatform);
   const [savePath, setSavePath] = useState("");
   const [selectedPreset, setSelectedPreset] = useState<string>("");
+  const [detectedOnSystem, setDetectedOnSystem] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Load community presets and detect local paths on mount/open
+  useEffect(() => {
+    if (isOpen) {
+      fetchCommunityPresets().then((loaded) => {
+        setPresets(loaded);
+      });
+    }
+  }, [isOpen]);
 
   // Reset form whenever modal opens
   useEffect(() => {
@@ -32,6 +43,7 @@ export const AddGameModal: React.FC<AddGameModalProps> = ({
       setPlatform(initialPlatform);
       setSavePath("");
       setSelectedPreset("");
+      setDetectedOnSystem(false);
       setErrorMsg(null);
     }
   }, [isOpen, initialPlatform]);
@@ -41,23 +53,31 @@ export const AddGameModal: React.FC<AddGameModalProps> = ({
   const handlePresetChange = (presetId: string) => {
     setSelectedPreset(presetId);
     setErrorMsg(null);
-    const preset = EMULATOR_PRESETS.find((p) => p.id === presetId);
+    const preset = presets.find((p) => p.id === presetId);
     if (preset) {
       setPlatform(preset.platform);
       setName(preset.name.replace(/\s*\(.*\)/, ""));
-      // Immediately clear and set clean template path for this specific preset
-      setSavePath(`/Users/player/Emulators/${preset.suggestedFileName}`);
+
+      // Smart path auto-detection: if file exists on this machine, pre-fill it!
+      if (preset.detectedPath) {
+        setSavePath(preset.detectedPath);
+        setDetectedOnSystem(true);
+      } else {
+        setSavePath(`/Users/player/Emulators/${preset.suggestedFileName}`);
+        setDetectedOnSystem(false);
+      }
       soundEngine.playClick();
     } else {
       setName("");
       setSavePath("");
+      setDetectedOnSystem(false);
     }
   };
 
   const handleBrowse = async (isDirectoryMode: boolean = false) => {
     soundEngine.playClick();
     try {
-      const preset = selectedPreset ? EMULATOR_PRESETS.find((p) => p.id === selectedPreset) : undefined;
+      const preset = selectedPreset ? presets.find((p) => p.id === selectedPreset) : undefined;
       const isDir = isDirectoryMode || (preset ? preset.defaultExtension === "dir" : false);
 
       const selected = await open({
@@ -68,6 +88,7 @@ export const AddGameModal: React.FC<AddGameModalProps> = ({
 
       if (selected && typeof selected === "string") {
         setSavePath(selected);
+        setDetectedOnSystem(false);
         if (!name.trim()) {
           const extractedName = selected.split(/[/\\]/).pop()?.replace(/\.[^/.]+$/, "") || "";
           if (extractedName) setName(extractedName);
@@ -133,19 +154,33 @@ export const AddGameModal: React.FC<AddGameModalProps> = ({
           )}
 
           <div>
-            <label className="text-[11px] font-medium text-neutral-300 flex items-center gap-1 mb-1">
-              <Sparkles className="w-3 h-3 text-amber-400" />
-              Emulator Preset (Optional)
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-[11px] font-medium text-neutral-300 flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-amber-400" />
+                <span>Emulator / Game Preset</span>
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  soundEngine.playClick();
+                  openModsFolder();
+                }}
+                className="text-[10px] text-neutral-400 hover:text-emerald-300 flex items-center gap-1 cursor-pointer transition-colors"
+                title="Open user custom presets folder"
+              >
+                <FolderArchive className="w-3 h-3" />
+                <span>Presets Mod Folder</span>
+              </button>
+            </div>
             <select
               value={selectedPreset}
               onChange={(e) => handlePresetChange(e.target.value)}
-              className="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/10 text-xs text-neutral-200 focus:outline-none focus:border-emerald-500/50"
+              className="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/10 text-xs text-neutral-200 focus:outline-none focus:border-emerald-500/50 cursor-pointer"
             >
               <option value="">-- Choose Preset or Custom --</option>
-              {EMULATOR_PRESETS.map((preset) => (
+              {presets.map((preset) => (
                 <option key={preset.id} value={preset.id}>
-                  {preset.name}
+                  {preset.name} {preset.detectedPath ? "✨ (Found on System)" : ""}
                 </option>
               ))}
             </select>
@@ -190,10 +225,18 @@ export const AddGameModal: React.FC<AddGameModalProps> = ({
           </div>
 
           <div>
-            <label className="text-[11px] font-medium text-neutral-300 flex items-center justify-between mb-1">
-              <span>Save Path (File or Folder)</span>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-[11px] font-medium text-neutral-300 flex items-center gap-1.5">
+                <span>Save Path (File or Folder)</span>
+                {detectedOnSystem && (
+                  <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 animate-in fade-in">
+                    <CheckCircle className="w-2.5 h-2.5" />
+                    Found on your system
+                  </span>
+                )}
+              </label>
               <span className="text-[10px] text-neutral-500">Auto-debounced</span>
-            </label>
+            </div>
             <div className="flex gap-1.5">
               <input
                 type="text"

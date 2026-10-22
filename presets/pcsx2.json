@@ -1,0 +1,22 @@
+{
+  "id": "pcsx2",
+  "name": "PCSX2",
+  "platform": "ps2",
+  "saveType": "file",
+  "fileExtensions": [".ps2"],
+  "defaultPaths": {
+    "macos": [
+      "~/Library/Application Support/PCSX2/memcards/Mcd001.ps2"
+    ],
+    "windows": [
+      "%USERPROFILE%/Documents/PCSX2/memcards/Mcd001.ps2"
+    ],
+    "linux": [
+      "~/.config/PCSX2/memcards/Mcd001.ps2",
+      "~/.var/app/net.pcsx2.PCSX2/config/PCSX2/memcards/Mcd001.ps2"
+    ]
+  },
+  "description": "Sony PlayStation 2 standard 8MB memory card (.ps2)",
+  "author": "MemCard Community",
+  "version": "1.0.0"
+}

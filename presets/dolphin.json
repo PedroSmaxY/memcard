@@ -1,0 +1,22 @@
+{
+  "id": "dolphin",
+  "name": "Dolphin",
+  "platform": "nintendo",
+  "saveType": "file",
+  "fileExtensions": [".raw", ".gcp"],
+  "defaultPaths": {
+    "macos": [
+      "~/Library/Application Support/Dolphin/GC/MemoryCardA.USA.raw"
+    ],
+    "windows": [
+      "%USERPROFILE%/Documents/Dolphin Emulator/GC/MemoryCardA.USA.raw"
+    ],
+    "linux": [
+      "~/.local/share/dolphin-emu/GC/MemoryCardA.USA.raw",
+      "~/.var/app/org.DolphinEmu.dolphin-emu/data/dolphin-emu/GC/MemoryCardA.USA.raw"
+    ]
+  },
+  "description": "Nintendo GameCube Memory Card (.raw / .gcp)",
+  "author": "MemCard Community",
+  "version": "1.0.0"
+}

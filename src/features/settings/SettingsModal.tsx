@@ -1,18 +1,33 @@
 import React, { useState, useEffect } from "react";
-import { X, Volume2, VolumeX, Bell, BellOff, ShieldCheck, HardDrive, Info } from "lucide-react";
+import { X, Volume2, VolumeX, Bell, BellOff, ShieldCheck, HardDrive, Info, RefreshCw, ArrowDownCircle } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 import { soundEngine } from "../../utils/audio";
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onCheckForUpdates?: () => Promise<void>;
+  isCheckingUpdates?: boolean;
+  updateAvailable?: boolean;
+  updateVersion?: string | null;
+  updateStatusMessage?: string | null;
+  onInstallUpdate?: () => Promise<void>;
 }
 
 const isTauriEnv = () =>
   typeof window !== "undefined" &&
   Boolean((window as unknown as { __TAURI_INTERNALS__?: unknown }).__TAURI_INTERNALS__);
 
-export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
+export const SettingsModal: React.FC<SettingsModalProps> = ({
+  isOpen,
+  onClose,
+  onCheckForUpdates,
+  isCheckingUpdates = false,
+  updateAvailable = false,
+  updateVersion = null,
+  updateStatusMessage = null,
+  onInstallUpdate,
+}) => {
   const [isMuted, setIsMuted] = useState(soundEngine.getIsMuted());
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
@@ -126,6 +141,45 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               <li>Game Running Guard (locks restore while game runs)</li>
               <li>Atomic pre-restore snapshot guarantee</li>
             </ul>
+          </div>
+
+          {/* In-App Software Updates */}
+          <div className="p-3 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <RefreshCw className={`w-4 h-4 text-emerald-400 ${isCheckingUpdates ? "animate-spin" : ""}`} />
+              <div>
+                <h4 className="text-xs font-semibold text-neutral-200">Software Updates</h4>
+                <p className="text-[10px] text-neutral-400">
+                  {updateStatusMessage || (updateAvailable ? `v${updateVersion} ready to install` : "Keep MemCard up-to-date")}
+                </p>
+              </div>
+            </div>
+
+            {updateAvailable && onInstallUpdate ? (
+              <button
+                onClick={() => {
+                  soundEngine.playClick();
+                  onInstallUpdate();
+                }}
+                className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-emerald-500 text-neutral-950 hover:bg-emerald-400 active:scale-95 transition-all shadow-md shadow-emerald-500/20 cursor-pointer"
+              >
+                <ArrowDownCircle className="w-3.5 h-3.5" />
+                <span>Update</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  soundEngine.playClick();
+                  if (onCheckForUpdates) {
+                    onCheckForUpdates();
+                  }
+                }}
+                disabled={isCheckingUpdates}
+                className="px-3 py-1 rounded-lg text-xs font-medium bg-white/10 text-neutral-300 hover:text-white hover:bg-white/15 transition-all disabled:opacity-50 cursor-pointer"
+              >
+                {isCheckingUpdates ? "Checking..." : "Check Now"}
+              </button>
+            )}
           </div>
 
           {/* About / Version */}

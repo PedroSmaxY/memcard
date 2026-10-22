@@ -1,0 +1,22 @@
+{
+  "id": "retroarch",
+  "name": "RetroArch",
+  "platform": "pc",
+  "saveType": "directory",
+  "fileExtensions": [".srm", ".state"],
+  "defaultPaths": {
+    "macos": [
+      "~/Library/Application Support/RetroArch/saves"
+    ],
+    "windows": [
+      "%APPDATA%/RetroArch/saves"
+    ],
+    "linux": [
+      "~/.config/retroarch/saves",
+      "~/.var/app/org.libretro.RetroArch/config/retroarch/saves"
+    ]
+  },
+  "description": "Multi-system global saves directory (.srm)",
+  "author": "MemCard Community",
+  "version": "1.0.0"
+}

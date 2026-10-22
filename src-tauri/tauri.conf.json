@@ -62,5 +62,13 @@
       "signingIdentity": "-",
       "minimumSystemVersion": "10.15"
     }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDgyMTc4NDRFNTdFRjJBMjMKUldRakt1OVhUb1FYZ3ZUY05ISHlHOUoxZW5NNkgrblkwYVpvUUpia2pRcVo1bStFS25vT1ZSYnAK",
+      "endpoints": [
+        "https://github.com/PedroSmaxY/memcard/releases/latest/download/latest.json"
+      ]
+    }
   }
 }

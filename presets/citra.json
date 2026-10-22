@@ -1,0 +1,22 @@
+{
+  "id": "citra",
+  "name": "Citra / Lime3DS",
+  "platform": "nintendo",
+  "saveType": "directory",
+  "fileExtensions": [],
+  "defaultPaths": {
+    "macos": [
+      "~/Library/Application Support/Citra/sdmc/Nintendo 3DS"
+    ],
+    "windows": [
+      "%APPDATA%/Citra/sdmc/Nintendo 3DS"
+    ],
+    "linux": [
+      "~/.local/share/citra-emu/sdmc/Nintendo 3DS",
+      "~/.var/app/org.citra_emu.citra/data/citra-emu/sdmc/Nintendo 3DS"
+    ]
+  },
+  "description": "Nintendo 3DS SDMC save storage",
+  "author": "MemCard Community",
+  "version": "1.0.0"
+}

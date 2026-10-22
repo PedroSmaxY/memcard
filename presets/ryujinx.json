@@ -1,0 +1,21 @@
+{
+  "id": "ryujinx",
+  "name": "Ryujinx",
+  "platform": "nintendo",
+  "saveType": "directory",
+  "fileExtensions": [],
+  "defaultPaths": {
+    "macos": [
+      "~/Library/Application Support/Ryujinx/bis/user/save"
+    ],
+    "windows": [
+      "%APPDATA%/Ryujinx/bis/user/save"
+    ],
+    "linux": [
+      "~/.config/Ryujinx/bis/user/save"
+    ]
+  },
+  "description": "Nintendo Switch savedata root directory",
+  "author": "MemCard Community",
+  "version": "1.0.0"
+}

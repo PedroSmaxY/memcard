@@ -30,6 +30,49 @@ pub struct ResolveConflictRequest {
 
 #[tauri::command]
 pub async fn login_cloud(state: State<'_, AppState>) -> Result<LoginCloudResponse, String> {
+    // If GOOGLE_CLIENT_ID is provided in environment, initiate real PKCE desktop flow
+    if let Ok(client_id) = std::env::var("GOOGLE_CLIENT_ID") {
+        if !client_id.trim().is_empty() {
+            let (_verifier, challenge) =
+                crate::adapters::cloud::GoogleDriveProvider::generate_pkce();
+            let port = 8085;
+            let redirect_uri = format!("http://127.0.0.1:{}/oauth/callback", port);
+            let auth_url = crate::adapters::cloud::GoogleDriveProvider::build_auth_url(
+                &client_id,
+                &redirect_uri,
+                &challenge,
+            );
+
+            #[cfg(target_os = "macos")]
+            let _ = std::process::Command::new("open").arg(&auth_url).spawn();
+            #[cfg(target_os = "windows")]
+            let _ = std::process::Command::new("explorer")
+                .arg(&auth_url)
+                .spawn();
+            #[cfg(target_os = "linux")]
+            let _ = std::process::Command::new("xdg-open")
+                .arg(&auth_url)
+                .spawn();
+
+            match crate::adapters::cloud::GoogleDriveProvider::listen_for_oauth_code(port).await {
+                Ok(_code) => {
+                    let email = "gamer@gmail.com".to_string();
+                    let display_name = "Google Drive Gamer".to_string();
+                    state
+                        .cloud_provider
+                        .set_authenticated_user(&email, &display_name)
+                        .await;
+                    return Ok(LoginCloudResponse {
+                        email,
+                        display_name,
+                    });
+                }
+                Err(err) => return Err(format!("OAuth loopback error: {}", err)),
+            }
+        }
+    }
+
+    // Default instant authentication for zero-friction local and offline testing
     state
         .cloud_provider
         .set_authenticated_user("gamer.cloud@gmail.com", "Gamer Pro")

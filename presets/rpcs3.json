@@ -1,0 +1,22 @@
+{
+  "id": "rpcs3",
+  "name": "RPCS3",
+  "platform": "modern",
+  "saveType": "directory",
+  "fileExtensions": [],
+  "defaultPaths": {
+    "macos": [
+      "~/Library/Application Support/rpcs3/dev_hdd0/home/00000001/savedata"
+    ],
+    "windows": [
+      "%APPDATA%/rpcs3/dev_hdd0/home/00000001/savedata"
+    ],
+    "linux": [
+      "~/.config/rpcs3/dev_hdd0/home/00000001/savedata",
+      "~/.var/app/net.rpcs3.RPCS3/config/rpcs3/dev_hdd0/home/00000001/savedata"
+    ]
+  },
+  "description": "Sony PlayStation 3 virtual HDD savedata folder",
+  "author": "MemCard Community",
+  "version": "1.0.0"
+}

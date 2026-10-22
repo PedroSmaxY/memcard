@@ -21,6 +21,8 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|app| {
             // Setup app data paths
             let app_data_dir = app
@@ -317,6 +319,10 @@ pub fn run() {
             commands::cloud::resolve_conflict,
             commands::get_notifications_enabled,
             commands::set_notifications_enabled,
+            commands::presets::list_presets,
+            commands::presets::save_custom_preset,
+            commands::presets::delete_custom_preset,
+            commands::presets::open_presets_folder,
         ])
         .run(tauri::generate_context!())
         .expect("error while running MemCard application");
