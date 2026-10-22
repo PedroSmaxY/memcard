@@ -1,13 +1,32 @@
 @import "tailwindcss";
 
+@layer base {
+  html, body, #root {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #12141a;
+    color: #f3f4f6;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* Universal Clickable Cursor */
+  button, 
+  [role="button"], 
+  select, 
+  a, 
+  input[type="checkbox"],
+  input[type="radio"] {
+    cursor: pointer;
+  }
+}
+
 @layer utilities {
-  /* Liquid Glass Neo-Skeuomorphic Styling - Stable Solid Glass Base */
+  /* Liquid Glass Neo-Skeuomorphic Styling */
   .liquid-glass {
-    background: rgba(18, 20, 26, 0.96);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 
-      0 20px 40px -15px rgba(0, 0, 0, 0.8),
-      inset 0 1px 1px 0 rgba(255, 255, 255, 0.2),
-      inset 0 -1px 2px 0 rgba(0, 0, 0, 0.5);
+    background: #12141a;
   }
 }

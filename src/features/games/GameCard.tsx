@@ -58,13 +58,10 @@ export const GameCard: React.FC<GameCardProps> = ({
           <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-neutral-400 group-hover:text-emerald-400 transition-colors">
             {game.isDirectory ? <Folder className="w-4 h-4" /> : <File className="w-4 h-4" />}
           </div>
-          <div className="overflow-hidden">
+          <div className="overflow-hidden" title={game.savePath}>
             <h3 className="text-xs font-semibold text-neutral-200 truncate group-hover:text-white transition-colors">
               {game.name}
             </h3>
-            <p className="text-[10px] text-neutral-400 font-mono truncate max-w-[220px]" title={game.savePath}>
-              {game.savePath}
-            </p>
           </div>
         </div>
 
@@ -117,7 +114,10 @@ export const GameCard: React.FC<GameCardProps> = ({
               <AlertCircle className="w-3 h-3" /> Conflict
             </span>
           ) : (
-            <span className="text-neutral-500 font-medium">Local Shield Active</span>
+            <span className="flex items-center gap-1.5 text-neutral-400 font-medium text-[10px]">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400/80 inline-block" />
+              <span>Protected</span>
+            </span>
           )}
         </div>
       </div>

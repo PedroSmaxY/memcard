@@ -19,7 +19,7 @@ describe("App Root Component", () => {
   it("renders the main app title and header controls", async () => {
     render(<App />);
 
-    expect(screen.getByText(/MemCard 01 \/\/ Cloud/i)).toBeInTheDocument();
+    expect(screen.getByText("MEMCARD")).toBeInTheDocument();
     expect(screen.getByText("Connect Drive")).toBeInTheDocument();
     expect(screen.getByTitle("Add Game")).toBeInTheDocument();
     expect(screen.getByTitle("Preferences")).toBeInTheDocument();

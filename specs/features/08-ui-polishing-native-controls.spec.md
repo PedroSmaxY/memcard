@@ -1,8 +1,8 @@
 # Feature Specification: 08 - UI Polishing, Native Window Controls & UX Ergonomics
 
 - **ID:** `08`
-- **Status:** `Draft`
-- **Author:** MemCard Cloud Team
+- **Status:** `Implemented`
+- **Author:** MemCard Team
 - **Created:** 2026-10-21
 - **Updated:** 2026-10-21
 
@@ -10,44 +10,37 @@
 
 ## 1. Context & Motivation
 Following real-world testing on macOS, several visual and ergonomic friction points were identified:
-1. Transparency flickering and background opacity shifting caused by WebKit backdrop blur re-compositing against the OS desktop.
-2. Unwanted visual elements (3 side grip holes and a pointy cut-out corner in the top right with faint ghost borders).
-3. Inability to drag the window reliably or close it directly from the window chrome.
-4. Absence of a native system file browser (`@tauri-apps/plugin-dialog`) for selecting emulator saves/directories.
-5. Accidental deletion risk without a styled in-app confirmation dialog.
-6. Sticky form state when switching between emulator presets.
+1. Transparency flickering and square ghost borders caused by frameless transparent window compositing.
+2. In-app simulated window buttons looking out-of-place compared to native system controls.
+3. Absence of a native system file browser (`@tauri-apps/plugin-dialog`) due to missing Tauri v2 capabilities.
+4. Non-standard clickable cursors on interactive buttons across the application.
+5. Branding clarity: abandoning "Cloud" and "01" in favor of the clean product name **MemCard**.
+6. Category navigation: lack of an "ALL" tab to view all enrolled saves across platforms.
+7. Visual clutter: redundant long file paths and overly prominent shield indicators on game cards.
 
 ---
 
 ## 2. Acceptance Criteria (Gherkin Syntax)
 
-### Scenario: Stable Dark Glass Shell & Organic Silhouette
-- **Given** the application window is rendered
-- **Then** the background opacity remains rock-solid without flickering (`#12141a` / `rgba(18, 20, 26, 0.96)`)
-- **And** the top-right diagonal polygon cut-path is removed in favor of organic, uniform rounded corners (`rounded-2xl`)
-- **And** the 3 right-side grip grooves are completely eliminated from the DOM.
-
-### Scenario: Native macOS Window Controls & Full Drag Region
-- **Given** the top header is rendered
-- **Then** native macOS-styled traffic light buttons (Red close, Yellow minimize) appear on the top-left
-- **And** clicking the Red button hides the window to the System Tray (`window.hide()`)
-- **And** clicking the Yellow button minimizes the window (`window.minimize()`)
-- **And** the entire empty top bar functions as `data-tauri-drag-region`, allowing instant window repositioning.
+### Scenario: Native Multi-Platform Window Controls & Solid Canvas
+- **Given** the application starts
+- **Then** the window uses native decorations with `titleBarStyle: "Overlay"` and `hiddenTitle: true` on macOS
+- **And** native Cocoa traffic lights are rendered on macOS with native window drop-shadows and corner radius
+- **And** the background uses a solid, non-flickering `#12141a` dark glass palette
+- **And** all buttons, tabs, and interactive elements display `cursor: pointer`.
 
 ### Scenario: Native File Picker for Save Files and Folders
 - **Given** the user opens the "Enroll Game Save" modal
-- **When** the user clicks "Browse Save..."
-- **Then** the native OS file picker (`open()` from `@tauri-apps/plugin-dialog`) is triggered
-- **And** opens in file mode (e.g. `.mcd`, `.srm`, `.sav`) or folder mode automatically based on the selected emulator preset.
+- **When** the user clicks "Browse..."
+- **Then** `dialog:default` capabilities grant permission and the native Finder/Explorer file dialog opens.
 
-### Scenario: Dynamic Emulator Preset Switching
-- **Given** the user selects an emulator preset in the Add Game modal
-- **When** switching from one preset (e.g. DuckStation) to another (e.g. PCSX2)
-- **Then** the game name and expected file template update immediately
-- **And** the previous custom path is cleared to avoid cross-emulator misconfiguration.
+### Scenario: Rebranding & Navigation
+- **Given** the header is rendered
+- **Then** the title displays clean uppercase `MEMCARD`
+- **And** the platform navigation bar renders `ALL` as the first and default selected tab.
 
-### Scenario: Styled Safe Delete Confirmation Modal
-- **Given** the user clicks the trash icon on a game card
-- **Then** an in-app styled modal appears asking for explicit confirmation
-- **And** provides an optional checkbox: *"Also delete historical backup snapshots from disk"*
-- **And** only executes deletion upon user confirmation.
+### Scenario: Ultra-Clean Game Cards & Subdued Footer
+- **Given** games are listed on the main dashboard
+- **Then** the redundant save file path is hidden from the main card view (retaining tooltip accessibility)
+- **And** the status badge displays a minimal green dot with `Protected`
+- **And** the footer displays a discreet `Shield Active` indicator.
