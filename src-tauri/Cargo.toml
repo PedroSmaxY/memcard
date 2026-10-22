@@ -1,6 +1,6 @@
 [package]
 name = "memcard"
-version = "0.2.1"
+version = "0.3.0"
 description = "Automated game save versioning, corruption prevention, and 1-click cloud sync"
 authors = ["MemCard Contributors"]
 edition = "2021"
