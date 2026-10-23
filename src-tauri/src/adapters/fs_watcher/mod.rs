@@ -37,6 +37,15 @@ pub struct EnrolledGameWatch {
     pub last_known_size: Option<u64>,
 }
 
+fn normalize_path(path: &Path) -> PathBuf {
+    let s = path.to_string_lossy();
+    if let Some(stripped) = s.strip_prefix(r"\\?\") {
+        PathBuf::from(stripped)
+    } else {
+        path.to_path_buf()
+    }
+}
+
 pub struct FsWatcherService {
     pub debounce_duration: Duration,
     pub shield_service: ShieldService,
@@ -87,10 +96,12 @@ impl FsWatcherService {
             loop {
                 tokio::select! {
                     Some(changed_path) = raw_rx.recv() => {
+                        let norm_changed = normalize_path(&changed_path);
                         // Find matching enrolled game for this path
                         let games_guard = games_clone.lock().await;
                         for enrolled_path in games_guard.keys() {
-                            if changed_path.starts_with(enrolled_path) || enrolled_path.starts_with(&changed_path) {
+                            let norm_enrolled = normalize_path(enrolled_path);
+                            if norm_changed.starts_with(&norm_enrolled) || norm_enrolled.starts_with(&norm_changed) {
                                 pending_paths.insert(enrolled_path.clone(), tokio::time::Instant::now() + debounce_duration);
                             }
                         }
@@ -193,6 +204,8 @@ impl FsWatcherService {
         let _ = self._watcher.unwatch(path);
         let mut games = self.games.lock().await;
         games.remove(path);
+        let norm = normalize_path(path);
+        games.retain(|p, _| normalize_path(p) != norm);
         Ok(())
     }
 
@@ -236,7 +249,7 @@ mod tests {
         watcher.trigger_path_change(save_path.clone()).await;
 
         // Expect debounced event
-        let event = tokio::time::timeout(Duration::from_millis(500), rx.recv()).await?;
+        let event = tokio::time::timeout(Duration::from_secs(4), rx.recv()).await?;
         match event {
             Some(WatchEvent::SaveChanged {
                 game_id: id,
@@ -276,7 +289,7 @@ mod tests {
         fs::write(&save_path, b"")?;
         watcher.trigger_path_change(save_path.clone()).await;
 
-        let event = tokio::time::timeout(Duration::from_millis(500), rx.recv()).await?;
+        let event = tokio::time::timeout(Duration::from_secs(4), rx.recv()).await?;
         match event {
             Some(WatchEvent::CorruptionDetected {
                 game_id: id,

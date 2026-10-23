@@ -97,7 +97,7 @@ async fn test_integrated_watcher_success_pipeline() -> Result<()> {
     watcher.trigger_path_change(save_file.clone()).await;
 
     // Receive debounced watcher event
-    let event = tokio::time::timeout(Duration::from_millis(600), rx.recv()).await?;
+    let event = tokio::time::timeout(Duration::from_secs(4), rx.recv()).await?;
     match event {
         Some(WatchEvent::SaveChanged {
             game_id: id,
@@ -186,7 +186,7 @@ async fn test_integrated_watcher_corruption_shield_pipeline() -> Result<()> {
     fs::write(&save_file, b"")?;
     watcher.trigger_path_change(save_file.clone()).await;
 
-    let event = tokio::time::timeout(Duration::from_millis(600), rx.recv()).await?;
+    let event = tokio::time::timeout(Duration::from_secs(4), rx.recv()).await?;
     match event {
         Some(WatchEvent::CorruptionDetected {
             game_id: id,

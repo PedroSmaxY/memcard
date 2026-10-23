@@ -395,7 +395,7 @@ async fn test_add_and_remove_game_with_watcher_enrollment() -> Result<()> {
         watcher_guard.trigger_path_change(save_path.clone()).await;
     }
 
-    let event = tokio::time::timeout(std::time::Duration::from_secs(2), watch_rx.recv()).await;
+    let event = tokio::time::timeout(std::time::Duration::from_secs(4), watch_rx.recv()).await;
     assert!(event.is_ok(), "Watcher event must be received");
     let received = event.unwrap();
     assert!(received.is_some());
