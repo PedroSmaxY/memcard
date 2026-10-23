@@ -142,3 +142,57 @@ Returns whether desktop OS notifications are enabled.
 Enables or disables desktop OS notifications (Gamer Mode).
 - **Parameters:** `{ enabled: boolean }`
 - **Returns:** `void`
+
+---
+
+## 5. Emulator & Community Presets
+
+### `list_presets`
+Returns all aggregated presets (built-in repository presets merged with user mod presets from `$APP_DATA/presets`), including smart on-disk detected save paths.
+- **Parameters:** none
+- **Returns:** `PresetDto[]`
+  ```typescript
+  interface PresetPaths {
+    macos?: string[];
+    windows?: string[];
+    linux?: string[];
+  }
+
+  interface PresetDto {
+    id: string;
+    name: string;
+    platform: string;
+    saveType: string;
+    fileExtensions: string[];
+    defaultPaths: PresetPaths;
+    description: string;
+    author: string;
+    version: string;
+    isCustom: boolean;
+    detectedPath?: string;
+  }
+  ```
+
+### `save_custom_preset`
+Saves or updates a custom user preset `.json` definition in `$APP_DATA/presets`.
+- **Parameters:** `{ preset: PresetDto }`
+- **Returns:** `void`
+
+### `delete_custom_preset`
+Removes a custom preset file by ID from `$APP_DATA/presets`.
+- **Parameters:** `{ presetId: string }`
+- **Returns:** `void`
+
+### `open_presets_folder`
+Opens the user's custom mod presets directory in the native file manager (Finder / Explorer / xdg-open).
+- **Parameters:** none
+- **Returns:** `void`
+
+---
+
+## 6. Utility
+
+### `ping`
+Diagnostic health-check command.
+- **Parameters:** none
+- **Returns:** `"pong"`

@@ -24,7 +24,10 @@ specs/
     ├── 03-cloud-sync-gdrive.spec.md
     ├── 04-conflict-resolution-flow.spec.md
     ├── 05-liquid-glass-ui-tray.spec.md
-    └── 06-safety-shields-and-retention.spec.md
+    ├── 06-safety-shields-and-retention.spec.md
+    ├── 07-multiplatform-release-automation.spec.md
+    ├── 08-ui-polishing-native-controls.spec.md
+    └── 09-auto-updater-and-community-presets.spec.md
 ```
 
 ---
