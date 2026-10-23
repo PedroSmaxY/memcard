@@ -63,8 +63,8 @@ jobs:
       - name: Install Ubuntu Dependencies
         if: matrix.os == 'ubuntu-latest'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+          sudo DEBIAN_FRONTEND=noninteractive apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -92,4 +92,14 @@ jobs:
 
       - name: Run Rust Tests
         working-directory: ./src-tauri
-        run: cargo test --all -- --nocapture
+        shell: bash
+        run: |
+          set -o pipefail
+          cargo test --all -- --nocapture 2>&1 | tee test-output.log
+
+      - name: Upload Test Output on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cargo-test-${{ matrix.os }}
+          path: src-tauri/test-output.log
