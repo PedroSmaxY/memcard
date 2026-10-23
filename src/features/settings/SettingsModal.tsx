@@ -186,7 +186,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <div className="flex items-center justify-between text-[11px] text-neutral-500 pt-2 border-t border-white/10">
             <div className="flex items-center gap-1.5">
               <Info className="w-3.5 h-3.5" />
-              <span>MemCard v0.3.0</span>
+              <span>MemCard v0.4.0</span>
             </div>
             <span>&lt; 40 MB RSS</span>
           </div>

@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.4.0] - 2026-10-22
 
 ### Added
 - **Auto-Discovery Save Scanner (`scan_installed_saves`):** Scans the local filesystem for known emulator memory cards and native PC decompilation saves, returning unenrolled games.
@@ -19,13 +19,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Integrated Watcher & Persistence Pipeline Tests:** End-to-end integration tests verifying automated save detection, 3s debounce, snapshot creation, database persistence, and failure blocking (`tests/watcher_and_persistence_pipeline.rs`).
 - **Explicit Cloud Upload Shield Inhibition:** Formally verified that zero-byte writes and >80% abrupt size drops are blocked before invoking cloud storage providers.
 - **Vitest Coverage Infrastructure:** Configured `@vitest/coverage-v8`, script `pnpm test:coverage`, and `text`, `json-summary`, and `lcov` reports with a 60% minimum threshold.
-- **CI Workflow Hardening:** Added explicit `pnpm build`, `cargo check`, and `pnpm test:coverage` to `.github/workflows/ci.yml`.
+- **CI Workflow Hardening & Multiplatform Diagnostics:** Added explicit `pnpm build`, `cargo check`, and `pnpm test:coverage` to `.github/workflows/ci.yml` alongside automated failure log extraction.
 
 ### Changed
 - **Header Optimization & Space Maximization:** Relocated the `+ Add Save` button to the top title bar alongside Google Drive and Settings, removing the platform category filter bar to maximize vertical space for game cards.
 - **SQLite Error Precision:** `set_pinned` now returns an explicit error if the targeted snapshot ID does not exist instead of silently ignoring it.
 
 ### Fixed
+- **Cross-Platform Compilation Gate (`target_os = "macos"`):** Gated Cocoa-specific `tauri::RunEvent::Reopen` behind macOS target conditional compilation to restore clean compilation and passing tests on Linux and Windows.
+- **Windows Path UNC Normalization:** Stripped `\\?\` verbatim UNC prefixes in `FsWatcherService` to ensure exact enrolled game path matching across all Windows environments.
 - **UpdateBanner Dismiss Cleanup:** Fixed issue where clicking `X` failed to dismiss the banner due to leftover error state; resets all update states on dismissal.
 - **Silent Background 404 Suppression:** Prevented red error alerts when background update checks receive 404 or missing release manifests on initial launches.
 - **Tauri Bundler Updater Manifests:** Configured `bundle.createUpdaterArtifacts: true` and `uploadUpdaterJson: true` in release workflows.
