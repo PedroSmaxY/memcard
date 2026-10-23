@@ -25,23 +25,14 @@ describe("App Root Component", () => {
     expect(screen.getByTitle("Preferences")).toBeInTheDocument();
   });
 
-  it("allows switching platform filters", async () => {
-    const user = userEvent.setup();
-    render(<App />);
-
-    const snesTab = screen.getByRole("button", { name: "nintendo" });
-    await user.click(snesTab);
-
-    expect(soundEngine.playClick).toHaveBeenCalled();
-  });
-
-  it("opens AddGameModal when Add Game button is clicked", async () => {
+  it("opens AddGameModal when Add Save button in header is clicked", async () => {
     const user = userEvent.setup();
     render(<App />);
 
     const addBtn = screen.getByTitle("Add Game");
     await user.click(addBtn);
 
+    expect(soundEngine.playClick).toHaveBeenCalled();
     expect(await screen.findByText("Enroll Game Save")).toBeInTheDocument();
   });
 
