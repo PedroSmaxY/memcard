@@ -97,6 +97,15 @@ jobs:
           set -o pipefail
           cargo test --all -- --nocapture 2>&1 | tee test-output.log
 
+      - name: Report Test Output to Summary
+        if: always()
+        shell: bash
+        run: |
+          echo "### Rust Test Output (${{ matrix.os }})" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -n 150 src-tauri/test-output.log >> $GITHUB_STEP_SUMMARY || true
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
       - name: Upload Test Output on Failure
         if: failure()
         uses: actions/upload-artifact@v4
