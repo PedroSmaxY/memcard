@@ -101,6 +101,7 @@ jobs:
           generateReleaseNotes: true
           releaseDraft: false
           prerelease: false
+          uploadUpdaterJson: true
           args: ${{ matrix.args }}
 
   checksums:

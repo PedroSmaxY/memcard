@@ -27,7 +27,8 @@ specs/
     ├── 06-safety-shields-and-retention.spec.md
     ├── 07-multiplatform-release-automation.spec.md
     ├── 08-ui-polishing-native-controls.spec.md
-    └── 09-auto-updater-and-community-presets.spec.md
+    ├── 09-auto-updater-and-community-presets.spec.md
+    └── 10-window-lifecycle-and-header-refactor.spec.md
 ```
 
 ---

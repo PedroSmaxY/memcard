@@ -27,7 +27,7 @@ export const UpdateBanner: React.FC<UpdateBannerProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  if (!available && !isDownloading && !error) {
+  if (!available && !isDownloading) {
     return null;
   }
 

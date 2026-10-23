@@ -75,11 +75,17 @@ export function useUpdater() {
     } catch (err: unknown) {
       console.warn("Failed to check for updates:", err);
       const errMsg = err instanceof Error ? err.message : String(err);
+      const isNotFound = errMsg.toLowerCase().includes("not fetch a valid release json") || errMsg.includes("404");
       setState((prev) => ({
         ...prev,
+        available: false,
         isChecking: false,
-        error: manual ? `Check failed: ${errMsg}` : null,
+        statusMessage: manual ? (isNotFound ? "MemCard is up to date" : "Update server temporarily unavailable") : null,
+        error: null,
       }));
+      if (manual) {
+        setTimeout(() => setState((prev) => ({ ...prev, statusMessage: null })), 4000);
+      }
     }
   }, []);
 
@@ -135,7 +141,7 @@ export function useUpdater() {
   }, [activeUpdate]);
 
   const dismiss = useCallback(() => {
-    setState((prev) => ({ ...prev, available: false, statusMessage: null }));
+    setState((prev) => ({ ...prev, available: false, error: null, statusMessage: null }));
   }, []);
 
   // Automatic background update check on app launch
