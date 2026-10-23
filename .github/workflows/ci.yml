@@ -97,14 +97,20 @@ jobs:
           set -o pipefail
           cargo test --all -- --nocapture 2>&1 | tee test-output.log
 
-      - name: Report Test Output to Summary
-        if: always()
+      - name: Annotate Test Output on Failure
+        if: failure()
         shell: bash
         run: |
-          echo "### Rust Test Output (${{ matrix.os }})" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          tail -n 150 src-tauri/test-output.log >> $GITHUB_STEP_SUMMARY || true
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          python -c "
+          import os
+          for path in ['src-tauri/test-output.log', 'test-output.log']:
+              if os.path.exists(path):
+                  with open(path, 'r', encoding='utf-8', errors='replace') as f:
+                      lines = [l.strip() for l in f if l.strip()]
+                  for l in lines[-40:]:
+                      print(f'::error title=Rust Test Failure::{l}')
+                  break
+          " || true
 
       - name: Upload Test Output on Failure
         if: failure()
