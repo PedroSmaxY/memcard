@@ -301,10 +301,13 @@ impl SnapshotRepository for SqliteDatabase {
 
     async fn set_pinned(&self, snapshot_id: Uuid, is_pinned: bool) -> Result<()> {
         let conn = self.conn.lock().await;
-        conn.execute(
+        let rows = conn.execute(
             "UPDATE snapshots SET is_pinned = ?1 WHERE id = ?2",
             params![if is_pinned { 1 } else { 0 }, snapshot_id.to_string()],
         )?;
+        if rows == 0 {
+            anyhow::bail!("Snapshot not found with id: {}", snapshot_id);
+        }
         Ok(())
     }
 

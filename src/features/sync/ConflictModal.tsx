@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { AlertTriangle, ArrowUpRight, ArrowDownLeft, Copy, HardDrive, Cloud } from "lucide-react";
 import { soundEngine } from "../../utils/audio";
 
@@ -26,6 +26,8 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
   onResolve,
   onClose,
 }) => {
+  const [isResolving, setIsResolving] = useState(false);
+
   if (!isOpen || !conflict) return null;
 
   const formatBytes = (bytes: number) => {
@@ -35,9 +37,15 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
   };
 
   const handleAction = async (action: "keep_local" | "use_cloud" | "branch_slot") => {
+    if (isResolving) return;
+    setIsResolving(true);
     soundEngine.playClick();
-    await onResolve(action);
-    onClose();
+    try {
+      await onResolve(action);
+      onClose();
+    } finally {
+      setIsResolving(false);
+    }
   };
 
   return (
@@ -92,7 +100,8 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
         <div className="flex flex-col gap-2 pt-1">
           <button
             onClick={() => handleAction("keep_local")}
-            className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-between text-left transition-all active:scale-[0.99] group"
+            disabled={isResolving}
+            className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-between text-left transition-all active:scale-[0.99] group disabled:opacity-50"
           >
             <div className="flex items-center gap-2.5">
               <ArrowUpRight className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -109,7 +118,8 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
 
           <button
             onClick={() => handleAction("use_cloud")}
-            className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-between text-left transition-all active:scale-[0.99] group"
+            disabled={isResolving}
+            className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-between text-left transition-all active:scale-[0.99] group disabled:opacity-50"
           >
             <div className="flex items-center gap-2.5">
               <ArrowDownLeft className="w-4 h-4 text-sky-400 shrink-0" />
@@ -126,7 +136,8 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({
 
           <button
             onClick={() => handleAction("branch_slot")}
-            className="p-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 flex items-center justify-between text-left transition-all active:scale-[0.99] group"
+            disabled={isResolving}
+            className="p-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 flex items-center justify-between text-left transition-all active:scale-[0.99] group disabled:opacity-50"
           >
             <div className="flex items-center gap-2.5">
               <Copy className="w-4 h-4 text-amber-400 shrink-0" />

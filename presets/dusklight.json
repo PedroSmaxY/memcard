@@ -1,0 +1,23 @@
+{
+  "id": "dusklight",
+  "name": "Twilit Realm (Dusklight TP Port)",
+  "platform": "pc",
+  "saveType": "file",
+  "fileExtensions": [".sav", ".bin"],
+  "defaultPaths": {
+    "macos": [
+      "~/Library/Application Support/TwilitRealm/Dusklight/saves",
+      "~/Library/Application Support/Dusklight/saves"
+    ],
+    "windows": [
+      "%APPDATA%/TwilitRealm/Dusklight/saves",
+      "%USERPROFILE%/Saved Games/Dusklight"
+    ],
+    "linux": [
+      "~/.local/share/TwilitRealm/Dusklight/saves"
+    ]
+  },
+  "description": "Native PC Port / Recompilation of The Legend of Zelda: Twilight Princess.",
+  "author": "MemCard Community",
+  "version": "1.0.0"
+}

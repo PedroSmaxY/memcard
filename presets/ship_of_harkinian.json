@@ -1,0 +1,24 @@
+{
+  "id": "ship_of_harkinian",
+  "name": "Ship of Harkinian (OoT Native PC)",
+  "platform": "pc",
+  "saveType": "directory",
+  "fileExtensions": [".sav", ".bin"],
+  "defaultPaths": {
+    "macos": [
+      "~/Library/Application Support/Ship of Harkinian/Save",
+      "~/Library/Application Support/com.harbourmasters.shipofharkinian/Save"
+    ],
+    "windows": [
+      "%APPDATA%/Ship of Harkinian/Save",
+      "%USERPROFILE%/Ship of Harkinian/Save"
+    ],
+    "linux": [
+      "~/.local/share/Ship of Harkinian/Save",
+      "~/.var/app/com.harbourmasters.shipofharkinian/data/Save"
+    ]
+  },
+  "description": "Harbour Masters native PC port of The Legend of Zelda: Ocarina of Time.",
+  "author": "MemCard Community",
+  "version": "1.0.0"
+}

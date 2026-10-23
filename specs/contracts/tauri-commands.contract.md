@@ -188,6 +188,19 @@ Opens the user's custom mod presets directory in the native file manager (Finder
 - **Parameters:** none
 - **Returns:** `void`
 
+### `scan_installed_saves`
+Scans the host file system for known emulator and native port save directories, returning games found that are not yet enrolled.
+- **Parameters:** none
+- **Returns:** `DiscoveredGameSaveDto[]`
+  ```typescript
+  interface DiscoveredGameSaveDto {
+    name: string;
+    platform: string;
+    detectedPath: string;
+    presetId?: string;
+  }
+  ```
+
 ---
 
 ## 6. Utility

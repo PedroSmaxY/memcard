@@ -1,3 +1,5 @@
+use crate::commands::AppState;
+use crate::core::ports::GameRepository;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -42,8 +44,12 @@ const DEFAULT_PRESETS_JSON: &[&str] = &[
     include_str!("../../../presets/retroarch.json"),
     include_str!("../../../presets/citra.json"),
     include_str!("../../../presets/cemu.json"),
-    include_str!("../../../presets/elden_ring.json"),
-    include_str!("../../../presets/hollow_knight.json"),
+    include_str!("../../../presets/zelda_wwhd.json"),
+    include_str!("../../../presets/dusklight.json"),
+    include_str!("../../../presets/ship_of_harkinian.json"),
+    include_str!("../../../presets/2ship2harkinian.json"),
+    include_str!("../../../presets/sm64ex.json"),
+    include_str!("../../../presets/opengoal.json"),
 ];
 
 /// Resolves path tokens like `~`, `%USERPROFILE%`, and `%APPDATA%` into an absolute path.
@@ -171,6 +177,49 @@ pub async fn delete_custom_preset(app: AppHandle, preset_id: String) -> Result<(
     }
 
     Ok(())
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct DiscoveredGameSaveDto {
+    pub name: String,
+    pub platform: String,
+    pub detected_path: String,
+    #[serde(default)]
+    pub preset_id: Option<String>,
+}
+
+#[tauri::command]
+pub async fn scan_installed_saves(
+    app: AppHandle,
+    state: tauri::State<'_, AppState>,
+) -> Result<Vec<DiscoveredGameSaveDto>, String> {
+    let home = app.path().home_dir().ok();
+    let mut discovered = Vec::new();
+
+    // 1. Get all already enrolled game save paths to avoid recommending existing ones
+    let enrolled_games = state.db.find_all().await.map_err(|e| e.to_string())?;
+
+    let enrolled_paths: std::collections::HashSet<String> =
+        enrolled_games.into_iter().map(|g| g.save_path).collect();
+
+    // 2. Load all presets (built-in + custom)
+    let presets = list_presets(app).await?;
+
+    for preset in presets {
+        if let Some(detected) = find_detected_save_path(&preset, home.as_deref()) {
+            if !enrolled_paths.contains(&detected) {
+                discovered.push(DiscoveredGameSaveDto {
+                    name: preset.name.clone(),
+                    platform: preset.platform.clone(),
+                    detected_path: detected,
+                    preset_id: Some(preset.id.clone()),
+                });
+            }
+        }
+    }
+
+    Ok(discovered)
 }
 
 #[tauri::command]

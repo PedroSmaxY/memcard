@@ -5,6 +5,7 @@ node_modules/
 # Production builds
 dist/
 dist-ssr/
+coverage/
 *.local
 
 # Tauri & Rust build artifacts

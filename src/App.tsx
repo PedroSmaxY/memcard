@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Gamepad2, 
   Cloud, 
@@ -9,9 +9,10 @@ import {
   History,
   HardDrive
 } from "lucide-react";
-import { useGames, Game } from "./hooks/useGames";
+import { useGames, Game, AddGamePayload } from "./hooks/useGames";
 import { useCloud } from "./hooks/useCloud";
 import { useUpdater } from "./hooks/useUpdater";
+import { scanInstalledSaves, DiscoveredGameSave } from "./features/games/presets";
 import { GameCard } from "./features/games/GameCard";
 import { AddGameModal } from "./features/games/AddGameModal";
 import { DeleteGameModal } from "./features/games/DeleteGameModal";
@@ -19,6 +20,8 @@ import { SnapshotDrawer } from "./features/snapshots/SnapshotDrawer";
 import { SettingsModal } from "./features/settings/SettingsModal";
 import { ConflictModal } from "./features/sync/ConflictModal";
 import { UpdateBanner } from "./features/updater/UpdateBanner";
+import { DiscoveredSavesBanner } from "./features/discovery/DiscoveredSavesBanner";
+import { DiscoveredSavesModal } from "./features/discovery/DiscoveredSavesModal";
 import { soundEngine } from "./utils/audio";
 
 export default function App() {
@@ -26,6 +29,9 @@ export default function App() {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [selectedGameForHistory, setSelectedGameForHistory] = useState<Game | null>(null);
   const [gameToDelete, setGameToDelete] = useState<Game | null>(null);
+  const [discoveredSaves, setDiscoveredSaves] = useState<DiscoveredGameSave[]>([]);
+  const [isDiscoveredModalOpen, setIsDiscoveredModalOpen] = useState(false);
+  const [isCloudLoading, setIsCloudLoading] = useState(false);
 
   const {
     games,
@@ -66,13 +72,32 @@ export default function App() {
   };
 
   const handleCloudToggle = async () => {
-    if (cloudStatus.isConnected) {
-      if (window.confirm(`Disconnect Google Drive account (${cloudStatus.email})?`)) {
-        await logoutCloud();
+    if (isCloudLoading) return;
+    setIsCloudLoading(true);
+    try {
+      if (cloudStatus.isConnected) {
+        if (window.confirm(`Disconnect Google Drive account (${cloudStatus.email})?`)) {
+          await logoutCloud();
+        }
+      } else {
+        await loginCloud();
       }
-    } else {
-      await loginCloud();
+    } finally {
+      setIsCloudLoading(false);
     }
+  };
+
+  useEffect(() => {
+    scanInstalledSaves().then((detected) => {
+      setDiscoveredSaves(detected);
+    });
+  }, [games]);
+
+  const handleBatchImport = async (saves: AddGamePayload[]) => {
+    for (const save of saves) {
+      await addGame(save);
+    }
+    setDiscoveredSaves([]);
   };
 
   return (
@@ -114,7 +139,8 @@ export default function App() {
 
           <button 
             onClick={handleCloudToggle}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium transition-all cursor-pointer ${
+            disabled={isCloudLoading}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium transition-all cursor-pointer disabled:opacity-50 ${
               cloudStatus.isConnected 
                 ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" 
                 : "bg-white/5 text-neutral-400 border border-white/10 hover:bg-white/10"
@@ -149,6 +175,13 @@ export default function App() {
         error={updateError}
         onInstall={installUpdateAndRelaunch}
         onDismiss={dismissUpdate}
+      />
+
+      {/* Auto-Discovered Local Saves Notification Banner */}
+      <DiscoveredSavesBanner
+        count={discoveredSaves.length}
+        onReview={() => setIsDiscoveredModalOpen(true)}
+        onDismiss={() => setDiscoveredSaves([])}
       />
 
       {/* Main Content: Games / Slots Area */}
@@ -280,6 +313,13 @@ export default function App() {
         isOpen={Boolean(activeConflict)}
         onResolve={resolveConflict}
         onClose={() => setActiveConflict(null)}
+      />
+
+      <DiscoveredSavesModal
+        isOpen={isDiscoveredModalOpen}
+        discovered={discoveredSaves}
+        onClose={() => setIsDiscoveredModalOpen(false)}
+        onImport={handleBatchImport}
       />
     </main>
   );

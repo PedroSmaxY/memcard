@@ -11,8 +11,12 @@ describe("Emulator Presets", () => {
     expect(ids).toContain("retroarch");
     expect(ids).toContain("citra");
     expect(ids).toContain("cemu");
-    expect(ids).toContain("elden_ring");
-    expect(ids).toContain("hollow_knight");
+    expect(ids).toContain("zelda_wwhd");
+    expect(ids).toContain("dusklight");
+    expect(ids).toContain("ship_of_harkinian");
+    expect(ids).toContain("2ship2harkinian");
+    expect(ids).toContain("sm64ex");
+    expect(ids).toContain("opengoal");
   });
 
   it("assigns valid platforms to each preset", () => {

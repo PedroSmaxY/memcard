@@ -36,15 +36,17 @@ jobs:
       - name: Install Frontend Dependencies
         run: pnpm install
 
-      - name: Frontend Format & Lint
+      - name: Frontend Format, Lint & Build
         run: |
           pnpm lint
           pnpm typecheck
+          pnpm build
 
-      - name: Rust Format & Clippy
+      - name: Rust Format, Check & Clippy
         working-directory: ./src-tauri
         run: |
           cargo fmt --check
+          cargo check
           cargo clippy -- -D warnings
 
   test:
@@ -85,8 +87,8 @@ jobs:
       - name: Install Frontend Dependencies
         run: pnpm install
 
-      - name: Run Frontend Tests
-        run: pnpm test
+      - name: Run Frontend Tests with Coverage
+        run: pnpm test:coverage
 
       - name: Run Rust Tests
         working-directory: ./src-tauri

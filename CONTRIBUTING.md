@@ -63,11 +63,23 @@ Run the verification suite locally:
 pnpm lint
 pnpm typecheck
 pnpm test
+pnpm test:coverage
+pnpm build
 
 # Backend (Rust)
+cd src-tauri
 cargo fmt --check
+cargo check
 cargo clippy -- -D warnings
 cargo test --all
 ```
+
+### Test Suites Architecture
+- **Frontend Unit & Component Tests (`pnpm test`):** Tests React components, hooks, contract compatibility, event resilience, and loading state guards.
+- **Frontend Coverage (`pnpm test:coverage`):** Enforces a minimum 60% coverage threshold with text, json-summary, and lcov reports.
+- **Backend Unit Tests (`cargo test --lib`):** Tests core domain models, hashing determinism, retention algorithms, and archive streaming.
+- **Command Integration Tests (`tests/commands_integration.rs`):** Validates all Tauri IPC handlers with real filesystem interactions and database state.
+- **Safety Invariants Tests (`tests/safety_invariants.rs`):** Validates Prime Invariants: Zero-Byte Shield, 80% Shrink Shield, Game Running Guard file locks, and Retention Pin preservation.
+- **Watcher & Persistence Pipeline Tests (`tests/watcher_and_persistence_pipeline.rs`):** Tests full automated save event pipelines, corruption blocking, cloud upload inhibition, and SQLite transaction resilience.
 
 Ensure `CHANGELOG.md` is updated under the `[Unreleased]` section.
