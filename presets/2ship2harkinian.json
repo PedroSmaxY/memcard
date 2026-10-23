@@ -1,0 +1,24 @@
+{
+  "id": "2ship2harkinian",
+  "name": "2 Ship 2 Harkinian (MM Native PC)",
+  "platform": "pc",
+  "saveType": "directory",
+  "fileExtensions": [".sav", ".bin"],
+  "defaultPaths": {
+    "macos": [
+      "~/Library/Application Support/2 Ship 2 Harkinian/Save",
+      "~/Library/Application Support/com.harbourmasters.2ship2harkinian/Save"
+    ],
+    "windows": [
+      "%APPDATA%/2 Ship 2 Harkinian/Save",
+      "%USERPROFILE%/2 Ship 2 Harkinian/Save"
+    ],
+    "linux": [
+      "~/.local/share/2 Ship 2 Harkinian/Save",
+      "~/.var/app/com.harbourmasters.2ship2harkinian/data/Save"
+    ]
+  },
+  "description": "Harbour Masters native PC port of The Legend of Zelda: Majora's Mask.",
+  "author": "MemCard Community",
+  "version": "1.0.0"
+}

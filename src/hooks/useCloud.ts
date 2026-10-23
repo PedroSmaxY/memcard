@@ -54,6 +54,10 @@ export function useCloud() {
           "sync:status-changed",
           (event) => {
             if (!isSubscribed) return;
+            if (!event?.payload?.status) {
+              console.warn("Invalid sync:status-changed payload received in useCloud:", event);
+              return;
+            }
             setStatus((prev) => ({
               ...prev,
               isSyncing: event.payload.status === "syncing",
@@ -74,6 +78,10 @@ export function useCloud() {
           "sync:conflict-detected",
           (event) => {
             if (!isSubscribed) return;
+            if (!event?.payload?.gameId) {
+              console.warn("Invalid sync:conflict-detected payload received in useCloud:", event);
+              return;
+            }
             soundEngine.playAlert();
             setActiveConflict(event.payload);
           }

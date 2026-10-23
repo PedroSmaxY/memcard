@@ -117,26 +117,76 @@ export const BUILTIN_PRESETS: EmulatorPreset[] = [
     version: "1.0.0",
   },
   {
-    id: "elden_ring",
-    name: "Elden Ring (PC)",
-    platform: "pc",
-    saveType: "directory",
-    defaultExtension: ".sl2",
-    suggestedFileName: "EldenRing",
-    description: "FromSoftware Elden Ring savegame folder (.sl2)",
-    author: "MemCard Community",
-    version: "1.0.0",
-  },
-  {
-    id: "hollow_knight",
-    name: "Hollow Knight (PC)",
+    id: "zelda_wwhd",
+    name: "Zelda: The Wind Waker HD Recomp",
     platform: "pc",
     saveType: "file",
-    defaultExtension: ".dat",
-    suggestedFileName: "user1.dat",
-    description: "Team Cherry Hollow Knight save file (user1.dat)",
+    defaultExtension: ".sav",
+    suggestedFileName: "save.sav",
+    description: "Native PC Recompilation of The Legend of Zelda: The Wind Waker HD.",
     author: "MemCard Community",
     version: "1.0.0",
+    fileExtensions: [".sav", ".bin", ".dat"],
+  },
+  {
+    id: "dusklight",
+    name: "Twilit Realm (Dusklight TP Port)",
+    platform: "pc",
+    saveType: "file",
+    defaultExtension: ".sav",
+    suggestedFileName: "save.sav",
+    description: "Native PC Port / Recompilation of The Legend of Zelda: Twilight Princess.",
+    author: "MemCard Community",
+    version: "1.0.0",
+    fileExtensions: [".sav", ".bin"],
+  },
+  {
+    id: "ship_of_harkinian",
+    name: "Ship of Harkinian (OoT Native PC)",
+    platform: "pc",
+    saveType: "directory",
+    defaultExtension: "dir",
+    suggestedFileName: "Save",
+    description: "Harbour Masters native PC port of The Legend of Zelda: Ocarina of Time.",
+    author: "MemCard Community",
+    version: "1.0.0",
+    fileExtensions: [".sav", ".bin"],
+  },
+  {
+    id: "2ship2harkinian",
+    name: "2 Ship 2 Harkinian (MM Native PC)",
+    platform: "pc",
+    saveType: "directory",
+    defaultExtension: "dir",
+    suggestedFileName: "Save",
+    description: "Harbour Masters native PC port of The Legend of Zelda: Majora's Mask.",
+    author: "MemCard Community",
+    version: "1.0.0",
+    fileExtensions: [".sav", ".bin"],
+  },
+  {
+    id: "sm64ex",
+    name: "Super Mario 64 PC Port (sm64ex)",
+    platform: "pc",
+    saveType: "file",
+    defaultExtension: ".bin",
+    suggestedFileName: "sm64_save_file.bin",
+    description: "Native PC port and decompilation of Super Mario 64.",
+    author: "MemCard Community",
+    version: "1.0.0",
+    fileExtensions: [".sav", ".bin"],
+  },
+  {
+    id: "opengoal",
+    name: "OpenGOAL (Jak and Daxter Native PC)",
+    platform: "pc",
+    saveType: "directory",
+    defaultExtension: "dir",
+    suggestedFileName: "saves",
+    description: "Native PC Port and engine recompilation of the Jak & Daxter trilogy.",
+    author: "MemCard Community",
+    version: "1.0.0",
+    fileExtensions: [".sav", ".bin"],
   },
   {
     id: "custom-pc",
@@ -248,4 +298,22 @@ export async function deletePresetMod(presetId: string): Promise<void> {
 export async function openModsFolder(): Promise<void> {
   if (!isTauriEnv()) return;
   await invoke("open_presets_folder");
+}
+
+export interface DiscoveredGameSave {
+  name: string;
+  platform: Platform;
+  detectedPath: string;
+  presetId?: string;
+}
+
+export async function scanInstalledSaves(): Promise<DiscoveredGameSave[]> {
+  if (!isTauriEnv()) return [];
+  try {
+    const raw = await invoke<DiscoveredGameSave[]>("scan_installed_saves");
+    return raw || [];
+  } catch (err) {
+    console.warn("Failed to scan installed saves:", err);
+    return [];
+  }
 }

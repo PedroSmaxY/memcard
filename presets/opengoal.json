@@ -1,0 +1,24 @@
+{
+  "id": "opengoal",
+  "name": "OpenGOAL (Jak and Daxter Native PC)",
+  "platform": "pc",
+  "saveType": "directory",
+  "fileExtensions": [".sav", ".bin"],
+  "defaultPaths": {
+    "macos": [
+      "~/Library/Application Support/OpenGOAL/saves",
+      "~/.config/OpenGOAL/saves"
+    ],
+    "windows": [
+      "%APPDATA%/OpenGOAL/saves",
+      "%USERPROFILE%/Saved Games/OpenGOAL"
+    ],
+    "linux": [
+      "~/.config/OpenGOAL/saves",
+      "~/.var/app/org.opengoal.OpenGOAL/config/OpenGOAL/saves"
+    ]
+  },
+  "description": "Native PC Port and engine recompilation of the Jak & Daxter trilogy.",
+  "author": "MemCard Community",
+  "version": "1.0.0"
+}

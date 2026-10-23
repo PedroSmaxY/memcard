@@ -1,0 +1,23 @@
+{
+  "id": "sm64ex",
+  "name": "Super Mario 64 PC Port (sm64ex)",
+  "platform": "pc",
+  "saveType": "file",
+  "fileExtensions": [".sav", ".bin"],
+  "defaultPaths": {
+    "macos": [
+      "~/.local/share/sm64ex/sm64_save_file.bin",
+      "~/Library/Application Support/sm64ex/sm64_save_file.bin"
+    ],
+    "windows": [
+      "%APPDATA%/sm64ex/sm64_save_file.bin",
+      "%USERPROFILE%/.local/share/sm64ex/sm64_save_file.bin"
+    ],
+    "linux": [
+      "~/.local/share/sm64ex/sm64_save_file.bin"
+    ]
+  },
+  "description": "Native PC port and decompilation of Super Mario 64.",
+  "author": "MemCard Community",
+  "version": "1.0.0"
+}

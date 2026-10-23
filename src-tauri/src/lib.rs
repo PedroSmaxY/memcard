@@ -339,6 +339,7 @@ pub fn run() {
             commands::presets::save_custom_preset,
             commands::presets::delete_custom_preset,
             commands::presets::open_presets_folder,
+            commands::presets::scan_installed_saves,
         ])
         .build(tauri::generate_context!())
         .expect("error while building MemCard application");

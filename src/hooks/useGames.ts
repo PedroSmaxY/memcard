@@ -126,8 +126,12 @@ export function useGames() {
       try {
         const unlisten1 = await listen<SaveChangedEventPayload>(
           "watcher:save-changed",
-          () => {
+          (event) => {
             if (!isSubscribed) return;
+            if (!event?.payload?.gameId) {
+              console.warn("Invalid watcher:save-changed payload received:", event);
+              return;
+            }
             soundEngine.playSaveChime();
             fetchGames();
           }
@@ -142,9 +146,14 @@ export function useGames() {
           "shield:corruption-detected",
           (event) => {
             if (!isSubscribed) return;
+            if (!event?.payload || typeof event.payload.reason !== "string") {
+              console.warn("Invalid shield:corruption-detected payload received:", event);
+              return;
+            }
             soundEngine.playAlert();
+            const gameName = event.payload.gameName || "Unknown Save";
             setError(
-              `Corruption Shield alert for ${event.payload.gameName}: Save was blocked because ${
+              `Corruption Shield alert for ${gameName}: Save was blocked because ${
                 event.payload.reason === "zero_bytes"
                   ? "file size dropped to 0 bytes."
                   : "file size shrank abruptly by over 80%."
@@ -164,6 +173,10 @@ export function useGames() {
           message?: string;
         }>("sync:status-changed", (event) => {
           if (!isSubscribed) return;
+          if (!event?.payload?.gameId || !event?.payload?.status) {
+            console.warn("Invalid sync:status-changed payload received:", event);
+            return;
+          }
           setGames((prev) =>
             prev.map((g) =>
               g.id === event.payload.gameId

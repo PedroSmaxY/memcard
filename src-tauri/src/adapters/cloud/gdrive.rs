@@ -83,54 +83,79 @@ impl GoogleDriveProvider {
         )
     }
 
-    /// Ephemeral loopback HTTP server that captures the authorization code
+    /// Ephemeral loopback HTTP server that captures the authorization code with 60s timeout
     pub async fn listen_for_oauth_code(port: u16) -> Result<String> {
         let listener = TcpListener::bind(format!("127.0.0.1:{}", port))
             .await
             .context("Failed to bind ephemeral loopback port for OAuth")?;
 
-        let (mut stream, _) = listener
-            .accept()
-            .await
-            .context("Failed to accept OAuth callback connection")?;
+        let accept_future = async {
+            let (mut stream, _) = listener
+                .accept()
+                .await
+                .context("Failed to accept OAuth callback connection")?;
 
-        let mut buffer = [0u8; 2048];
-        let n = stream
-            .read(&mut buffer)
-            .await
-            .context("Failed to read OAuth callback payload")?;
+            let mut buffer = [0u8; 2048];
+            let n = stream
+                .read(&mut buffer)
+                .await
+                .context("Failed to read OAuth callback payload")?;
 
-        let request_str = String::from_utf8_lossy(&buffer[..n]);
-        let code = Self::extract_code_from_http_request(&request_str)
-            .context("Could not extract authorization code from OAuth callback")?;
+            let request_str = String::from_utf8_lossy(&buffer[..n]);
 
-        let html = "<!DOCTYPE html><html><body style='background:#12141a;color:#34d399;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;'><h2>MemCard Connected! You may close this tab.</h2></body></html>";
-        let response = format!(
-            "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
-            html.len(),
-            html
-        );
+            // Check if provider returned an error parameter
+            if let Some(err_code) = Self::extract_param_from_http_request(&request_str, "error") {
+                let err_html = "<!DOCTYPE html><html><body style='background:#12141a;color:#f87171;font-family:sans-serif;'><h2>Authentication Denied</h2></body></html>";
+                let response = format!(
+                    "HTTP/1.1 400 Bad Request\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
+                    err_html.len(),
+                    err_html
+                );
+                let _ = stream.write_all(response.as_bytes()).await;
+                let _ = stream.flush().await;
+                anyhow::bail!("OAuth provider rejected authentication: {}", err_code);
+            }
 
-        let _ = stream.write_all(response.as_bytes()).await;
-        let _ = stream.flush().await;
+            let code = Self::extract_param_from_http_request(&request_str, "code")
+                .context("Invalid OAuth callback: missing authorization code")?;
 
-        Ok(code)
+            let html = "<!DOCTYPE html><html><body style='background:#12141a;color:#34d399;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;'><h2>MemCard Connected! You may close this tab.</h2></body></html>";
+            let response = format!(
+                "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
+                html.len(),
+                html
+            );
+
+            let _ = stream.write_all(response.as_bytes()).await;
+            let _ = stream.flush().await;
+
+            Ok(code)
+        };
+
+        match tokio::time::timeout(std::time::Duration::from_secs(60), accept_future).await {
+            Ok(res) => res,
+            Err(_) => anyhow::bail!("OAuth callback timed out after 60 seconds"),
+        }
     }
 
-    fn extract_code_from_http_request(request: &str) -> Option<String> {
+    pub fn extract_param_from_http_request(request: &str, param_name: &str) -> Option<String> {
         for line in request.lines() {
             if line.starts_with("GET ") {
                 let path = line.split_whitespace().nth(1)?;
                 let query = path.split('?').nth(1)?;
                 for param in query.split('&') {
                     let mut parts = param.split('=');
-                    if parts.next()? == "code" {
+                    if parts.next()? == param_name {
                         return parts.next().map(|s| s.to_string());
                     }
                 }
             }
         }
         None
+    }
+
+    pub fn extract_code_from_http_request(request: &str) -> Option<String> {
+        Self::extract_param_from_http_request(request, "code")
     }
 
     /// Checks whether local and remote save states have diverged.
@@ -339,5 +364,31 @@ mod tests {
         let conflict = conflict.unwrap();
         assert_eq!(conflict.local_hash, "localhash1111");
         assert_eq!(conflict.remote_hash, "remotehash9999");
+    }
+
+    #[test]
+    fn extracts_oauth_code_and_handles_error_callback() {
+        let success_req = "GET /oauth/callback?code=4%2F0AX4XfWh897&scope=drive HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n";
+        assert_eq!(
+            GoogleDriveProvider::extract_code_from_http_request(success_req),
+            Some("4%2F0AX4XfWh897".to_string())
+        );
+
+        let error_req =
+            "GET /oauth/callback?error=access_denied HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n";
+        assert_eq!(
+            GoogleDriveProvider::extract_param_from_http_request(error_req, "error"),
+            Some("access_denied".to_string())
+        );
+        assert_eq!(
+            GoogleDriveProvider::extract_code_from_http_request(error_req),
+            None
+        );
+
+        let invalid_req = "POST /other/path HTTP/1.1\r\n\r\n";
+        assert_eq!(
+            GoogleDriveProvider::extract_code_from_http_request(invalid_req),
+            None
+        );
     }
 }

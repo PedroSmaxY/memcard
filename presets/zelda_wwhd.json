@@ -1,0 +1,24 @@
+{
+  "id": "zelda_wwhd",
+  "name": "Zelda: The Wind Waker HD Recomp",
+  "platform": "pc",
+  "saveType": "file",
+  "fileExtensions": [".sav", ".bin", ".dat"],
+  "defaultPaths": {
+    "macos": [
+      "~/Library/Application Support/ZeldaWWHD/saves",
+      "~/.local/share/ZeldaWWHD/saves"
+    ],
+    "windows": [
+      "%APPDATA%/ZeldaWWHD/saves",
+      "%LOCALAPPDATA%/ZeldaWWHD/saves"
+    ],
+    "linux": [
+      "~/.local/share/ZeldaWWHD/saves",
+      "~/.var/app/com.github.ZeldaWWHD/data/saves"
+    ]
+  },
+  "description": "Native PC Recompilation of The Legend of Zelda: The Wind Waker HD.",
+  "author": "MemCard Community",
+  "version": "1.0.0"
+}
