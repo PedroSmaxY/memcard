@@ -1,7 +1,7 @@
 # Feature Specification: 10 - macOS Window Lifecycle, Header Optimization & Updater Resiliency
 
 - **ID:** `10`
-- **Status:** `Accepted`
+- **Status:** `Implemented`
 - **Author(s):** Pedro H. Novais, Antigravity
 - **Created:** 2026-10-22
 - **Updated:** 2026-10-22

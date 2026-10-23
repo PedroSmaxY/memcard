@@ -1,7 +1,7 @@
 # Feature Specification: 11 - Native Port Presets, Auto-Discovery Scanner & Rigorous Safety Test Hardening
 
 - **ID:** `11`
-- **Status:** `Accepted`
+- **Status:** `Implemented`
 - **Author(s):** Pedro H. Novais, Antigravity
 - **Created:** 2026-10-22
 - **Updated:** 2026-10-22

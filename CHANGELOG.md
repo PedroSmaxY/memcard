@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Auto-Discovery Save Scanner (`scan_installed_saves`):** Scans the local filesystem for known emulator memory cards and native PC decompilation saves, returning unenrolled games.
+- **Interactive Auto-Discovery UI:** Added discrete `DiscoveredSavesBanner` and comprehensive `DiscoveredSavesModal` with 1-click batch import into active version tracking.
+- **Native PC Recompilations & Ports Presets:** Replaced commercial Steam titles with built-in presets for *Zelda: The Wind Waker HD Recomp*, *Twilit Realm (Dusklight)*, *Ship of Harkinian*, *2 Ship 2 Harkinian*, *Super Mario 64 PC Port (sm64ex)*, and *OpenGOAL (Jak & Daxter)*.
+- **macOS Window Lifecycle & Reopen:** Supported `tauri::RunEvent::Reopen` to restore and focus the window upon clicking the macOS Dock icon, plus left-click restore from the system Menu Bar tray icon.
+- **Titlebar Traffic Light Cursor Affordance:** Isolated native window controls in a non-draggable area to preserve native arrow cursor interaction.
+- **Automated Contract Compatibility Suite:** Added automated tests comparing IPC markdown contracts with Rust serialization and React frontend payloads (`src/test/contracts.test.ts`).
+- **Tauri Push Event Payload Resilience:** Added defensive guards against null, incomplete, or corrupted event payloads across all 4 push events (`src/test/event-resilience.test.ts`).
+- **Loading State & Duplicate Action Guards:** Added UI and hook guards preventing duplicate triggers during snapshot creation, restores, conflict resolutions, and updates (`src/test/duplicate-actions.test.tsx`).
+- **Integrated Watcher & Persistence Pipeline Tests:** End-to-end integration tests verifying automated save detection, 3s debounce, snapshot creation, database persistence, and failure blocking (`tests/watcher_and_persistence_pipeline.rs`).
+- **Explicit Cloud Upload Shield Inhibition:** Formally verified that zero-byte writes and >80% abrupt size drops are blocked before invoking cloud storage providers.
+- **Vitest Coverage Infrastructure:** Configured `@vitest/coverage-v8`, script `pnpm test:coverage`, and `text`, `json-summary`, and `lcov` reports with a 60% minimum threshold.
+- **CI Workflow Hardening:** Added explicit `pnpm build`, `cargo check`, and `pnpm test:coverage` to `.github/workflows/ci.yml`.
+
+### Changed
+- **Header Optimization & Space Maximization:** Relocated the `+ Add Save` button to the top title bar alongside Google Drive and Settings, removing the platform category filter bar to maximize vertical space for game cards.
+- **SQLite Error Precision:** `set_pinned` now returns an explicit error if the targeted snapshot ID does not exist instead of silently ignoring it.
+
+### Fixed
+- **UpdateBanner Dismiss Cleanup:** Fixed issue where clicking `X` failed to dismiss the banner due to leftover error state; resets all update states on dismissal.
+- **Silent Background 404 Suppression:** Prevented red error alerts when background update checks receive 404 or missing release manifests on initial launches.
+- **Tauri Bundler Updater Manifests:** Configured `bundle.createUpdaterArtifacts: true` and `uploadUpdaterJson: true` in release workflows.
+- **OAuth Loopback Timeout & Error Handling:** Added a 60-second timeout to the ephemeral loopback server and parsed provider error queries (`access_denied`).
+
 ## [0.3.0] - 2026-10-22
 
 ### Added
